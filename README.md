@@ -13,9 +13,7 @@ spring:
         opaquetoken:
           introspection-uri: https://api.github.com/user
           client-id: token
-          client-secret: REPLACE_ME
-  profiles:
-    active: dev
+          client-secret: ghp_REPLACE_ME
 ```
 
 ### GitHub app auth

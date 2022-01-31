@@ -1,0 +1,28 @@
+# !!!
+# Create http-client.private.env.json and init variables
+# !!!
+
+### Get OAuth Access Token
+# !!! replace "code" query param
+# !!! you can use PAT Github token as well: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+# !!! For code navigate to:
+# https://github.com/login/oauth/authorize?client_id=Iv1.94657f4b86f3738d&redirect_uri=http://localhost:8080/oauth/access_token
+POST localhost:8080/oauth/access_token?code=XXX
+Accept: application/json
+
+> {% client.global.set("token", response.body.access_token); %}
+
+### Curerent logged user
+GET localhost:8080/user
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Organizations
+GET localhost:8080/organization
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Get List of Sa10 templates
+GET localhost:8080/salo/environment/templates
+Content-Type: application/json
+Authorization: Bearer {{token}}

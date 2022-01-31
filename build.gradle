@@ -1,0 +1,70 @@
+plugins {
+  id 'org.springframework.boot' version '2.6.3'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  id 'org.asciidoctor.convert' version '1.5.8'
+  id 'java'
+}
+
+group = 'com.vitechteam'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+ext {
+  set('snippetsDir', file("build/generated-snippets"))
+  set('testcontainersVersion', "1.16.2")
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+  //  for GH secret encryption
+  implementation "com.goterl:lazysodium-java:5.1.1"
+  implementation "net.java.dev.jna:jna:5.10.0"
+
+  //  code style
+  implementation 'com.google.code.findbugs:jsr305:3.0.2'
+
+  implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.1'
+
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+  annotationProcessor 'org.projectlombok:lombok'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+  testImplementation 'org.testcontainers:junit-jupiter'
+  implementation group: 'org.kohsuke', name: 'github-api', version: '1.301'
+
+//  implementation 'io.jsonwebtoken:jjwt:0.9.1'
+//  implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+  }
+}
+
+tasks.named('test') {
+  outputs.dir snippetsDir
+  useJUnitPlatform()
+}
+
+tasks.named('asciidoctor') {
+  inputs.dir snippetsDir
+  dependsOn test
+}

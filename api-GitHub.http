@@ -1,0 +1,42 @@
+// Create http-client.private.env.json and init variables
+
+### Get Organizations
+GET https://api.github.com/user/orgs
+Accept: application/json
+Authorization: token  {{ token }}
+
+### Get Workflows
+GET https://api.github.com/repos/vitech-team-sdlc/jx3-terraform-eks/actions/workflows/test.yml/runs?branch=serhiykrupka-patch-1
+Accept: application/json
+Authorization: token  {{ token }}
+
+### Trigger GitHub action
+POST https://api.github.com/repos/vitech-team-sdlc/infra-example-DEV/actions/workflows/main.yml/dispatches
+Accept: application/vnd.github.v3+json
+Content-Type: application/json
+Authorization: token  {{ token }}
+
+{
+  "ref": "main",
+  "inputs": {
+    "awsRegion": "us-east-1",
+    "applyInfra": "false",
+    "destroyInfra": "false"
+  }
+}
+
+### Get action
+GET https://api.github.com/repos/vitech-team-sdlc/infra-example-DEV/actions/workflows
+Accept: application/vnd.github.v3+json
+Content-Type: application/json
+Authorization: token  {{ token }}
+
+
+### oauth token validation
+POST https://api.github.com/applications/{{clientId}}/token
+Content-Type: application/json
+Authorization: Basic {{clientId}} {{clientSecret}}
+
+{
+  "access_token": "XXX"
+}

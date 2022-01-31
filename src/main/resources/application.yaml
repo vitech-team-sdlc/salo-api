@@ -1,0 +1,8 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          introspection-uri: https://api.github.com/applications/Iv1.94657f4b86f3738d/token
+          client-id: Iv1.94657f4b86f3738d
+          client-secret: ${GH_CLIENT_SECRET:INVALID_DEFAULT_GH_SECRET}

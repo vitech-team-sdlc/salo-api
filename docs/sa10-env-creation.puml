@@ -1,0 +1,40 @@
+@startuml
+
+autonumber
+
+USER -> SALO_UI: create new installation
+SALO_UI -> SALO_API: create new sa10
+
+loop each environment
+    alt is dev or remote cluster
+
+        SALO_API -> GitHub: create new env repo
+        GitHub --> SALO_API: ack
+
+        SALO_API -> GitHub: create new **infra** repo
+        GitHub --> SALO_API: ack
+
+        SALO_API -> GitHub: create secrets
+        GitHub --> SALO_API: ack
+
+        SALO_API -> SALO_API: generate TF variables
+        GitHub --> SALO_API: ack
+
+        SALO_API -> GitHub: commit TF variables changes
+        GitHub --> SALO_API: ack
+    end alt
+
+
+    SALO_API -> SALO_API: configure DEV environment
+    SALO_API -> GitHub: commit changes
+
+     alt is dev or remote cluster
+        SALO_API -> GitHub: trigger GitHub action for env creation
+        GitHub --> SALO_API: ack about start
+     end alt
+end
+
+SALO_API --> SALO_UI: process creation started
+SALO_UI --> USER: creation started
+
+@enduml

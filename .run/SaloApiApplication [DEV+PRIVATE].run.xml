@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SaloApiApplication[DEV+PRIVATE]" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="salo-api.main" />
+    <extension name="com.egoshard.intellij.k8s-runtime-config-plugin">
+      <option name="ENABLED" value="false" />
+      <entries />
+    </extension>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.vitechteam.sdlc.SdlcApiApplication" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

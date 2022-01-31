@@ -1,0 +1,3 @@
+salo:
+  testing:
+    gh_token: ${GH_TOKEN}

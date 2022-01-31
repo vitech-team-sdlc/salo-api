@@ -1,0 +1,25 @@
+@startuml
+
+autonumber
+
+USER -> SALO_UI: get **sa10** status
+loop environments
+    SALO_UI -> SALO_API: get **sa10** status
+    SALO_API -> GitHub: find sa10 installation by name
+    SALO_API -> GitHub: get latest "infra" action status
+    alt is job finished
+        box "kubernetes cluster" #LightBlue
+            SALO_API -> SALO_HELPER: get boot job status
+            SALO_HELPER -> k8s_jobs: find boot job status
+            k8s_jobs --> SALO_HELPER: result
+            SALO_HELPER --> SALO_API: job status
+        end box
+    end alt
+end alt
+
+SALO_API -> SALO_API: process statuses
+
+SALO_API --> SALO_UI: status
+SALO_UI --> USER:  status
+
+@enduml

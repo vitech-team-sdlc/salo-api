@@ -9,12 +9,12 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class GitHubAccessToken {
-  String access_token;
-  int expires_in;
-  String refresh_token;
-  int refresh_token_expires_in;
-  String scope;
-  String token_type;
-  @With
-  Boolean active;
+    String access_token;
+    int expires_in;
+    String refresh_token;
+    int refresh_token_expires_in;
+    String scope;
+    String token_type;
+    @With
+    Boolean active;
 }

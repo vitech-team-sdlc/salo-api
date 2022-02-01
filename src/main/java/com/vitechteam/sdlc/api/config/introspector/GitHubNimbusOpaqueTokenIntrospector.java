@@ -25,55 +25,54 @@ import java.util.Map;
 
 public class GitHubNimbusOpaqueTokenIntrospector extends NimbusOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 
-  public GitHubNimbusOpaqueTokenIntrospector(OAuth2ResourceServerProperties oAuth2ResourceServerProperties) {
-    super(
-      oAuth2ResourceServerProperties.getOpaquetoken().getIntrospectionUri(),
-      new RestTemplateBuilder()
-        .additionalInterceptors(new BasicAuthenticationInterceptor(
-          oAuth2ResourceServerProperties.getOpaquetoken().getClientId(),
-          oAuth2ResourceServerProperties.getOpaquetoken().getClientSecret()
-        ))
-        .additionalInterceptors(getClientHttpRequestInterceptor())
-        .build()
-    );
-    setRequestEntityConverter(githubIntrospectMsgConverter(
-      URI.create(oAuth2ResourceServerProperties.getOpaquetoken().getIntrospectionUri())
-    ));
-  }
-
-  private static ClientHttpRequestInterceptor getClientHttpRequestInterceptor() {
-    return (request, body, execution) -> {
-      final ClientHttpResponse response = execution.execute(request, body);
-      final var objectMapper = new ObjectMapper();
-
-      if (!response.getStatusCode().is2xxSuccessful()) {
-        final var responseBody = IOUtils.toInputStream(
-          objectMapper.writeValueAsString(Map.of("active", false)), Charset.defaultCharset()
+    public GitHubNimbusOpaqueTokenIntrospector(OAuth2ResourceServerProperties oAuth2ResourceServerProperties) {
+        super(
+                oAuth2ResourceServerProperties.getOpaquetoken().getIntrospectionUri(),
+                new RestTemplateBuilder()
+                        .additionalInterceptors(new BasicAuthenticationInterceptor(
+                                oAuth2ResourceServerProperties.getOpaquetoken().getClientId(),
+                                oAuth2ResourceServerProperties.getOpaquetoken().getClientSecret()
+                        ))
+                        .additionalInterceptors(getClientHttpRequestInterceptor())
+                        .build()
         );
-        return new HackedHttpResponse(response, responseBody);
-      }
+        setRequestEntityConverter(githubIntrospectMsgConverter(
+                URI.create(oAuth2ResourceServerProperties.getOpaquetoken().getIntrospectionUri())
+        ));
+    }
 
-      final var map = objectMapper.readValue(response.getBody(), Map.class);
-      map.put("active", true);
-      map.put("scm", ScmProvider.GITHUB);
-      final InputStream responseBody = IOUtils.toInputStream(
-        objectMapper.writeValueAsString(map), Charset.defaultCharset()
-      );
-      return new HackedHttpResponse(response, responseBody);
-    };
-  }
+    private static ClientHttpRequestInterceptor getClientHttpRequestInterceptor() {
+        return (request, body, execution) -> {
+            final ClientHttpResponse response = execution.execute(request, body);
+            final var objectMapper = new ObjectMapper();
 
-  private Converter<String, RequestEntity<?>> githubIntrospectMsgConverter(URI introspectionUri) {
-    return token -> {
-      final var headers = new HttpHeaders();
-      headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                final var responseBody = IOUtils.toInputStream(
+                        objectMapper.writeValueAsString(Map.of("active", false)), Charset.defaultCharset()
+                );
+                return new HackedHttpResponse(response, responseBody);
+            }
 
-      final Map<String, String> body = new HashMap<>();
-      body.put("access_token", token);
-      return new RequestEntity<>(body, headers, HttpMethod.POST, introspectionUri);
-    };
-  }
+            final var map = objectMapper.readValue(response.getBody(), Map.class);
+            map.put("active", true);
+            map.put("scm", ScmProvider.GITHUB);
+            final InputStream responseBody = IOUtils.toInputStream(
+                    objectMapper.writeValueAsString(map), Charset.defaultCharset()
+            );
+            return new HackedHttpResponse(response, responseBody);
+        };
+    }
 
+    private Converter<String, RequestEntity<?>> githubIntrospectMsgConverter(URI introspectionUri) {
+        return token -> {
+            final var headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+            final Map<String, String> body = new HashMap<>();
+            body.put("access_token", token);
+            return new RequestEntity<>(body, headers, HttpMethod.POST, introspectionUri);
+        };
+    }
 
 
 }

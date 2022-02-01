@@ -18,40 +18,40 @@ import java.security.Principal;
 @Service
 public class ScmResolver {
 
-  static class ScmProviderNotFound extends RuntimeException {
-  }
-
-  @SneakyThrows
-  public Scm resolve(@Nonnull ScmProvider scm, String token) {
-    if (scm == ScmProvider.GITHUB) {
-      return new GitHubScm(
-        GitHub.connectUsingOAuth(token),
-        new CustomGithubClient(token)
-      );
-    }
-    throw new ScmProviderNotFound();
-  }
-
-  @Nonnull
-  public Scm resolve(@Nonnull Principal principal) {
-    if (principal instanceof BearerTokenAuthentication bearer) {
-      final OAuth2AccessToken token = bearer.getToken();
-      final ScmProvider scm = ScmProvider.valueOf(bearer.getTokenAttributes().get("scm").toString());
-      return resolve(scm, token.getTokenValue());
+    static class ScmProviderNotFound extends RuntimeException {
     }
 
-    throw new UnknownScm("unknown scm provider");
-  }
-
-  @Nonnull
-  public SaloService getSaloService(@Nonnull Principal principal) {
-    return new DefaultSaloService(this.resolve(principal));
-  }
-
-  public static class UnknownScm extends RuntimeException {
-    public UnknownScm(String message) {
-      super(message);
+    @SneakyThrows
+    public Scm resolve(@Nonnull ScmProvider scm, String token) {
+        if (scm == ScmProvider.GITHUB) {
+            return new GitHubScm(
+                    GitHub.connectUsingOAuth(token),
+                    new CustomGithubClient(token)
+            );
+        }
+        throw new ScmProviderNotFound();
     }
-  }
+
+    @Nonnull
+    public Scm resolve(@Nonnull Principal principal) {
+        if (principal instanceof BearerTokenAuthentication bearer) {
+            final OAuth2AccessToken token = bearer.getToken();
+            final ScmProvider scm = ScmProvider.valueOf(bearer.getTokenAttributes().get("scm").toString());
+            return resolve(scm, token.getTokenValue());
+        }
+
+        throw new UnknownScm("unknown scm provider");
+    }
+
+    @Nonnull
+    public SaloService getSaloService(@Nonnull Principal principal) {
+        return new DefaultSaloService(this.resolve(principal));
+    }
+
+    public static class UnknownScm extends RuntimeException {
+        public UnknownScm(String message) {
+            super(message);
+        }
+    }
 
 }

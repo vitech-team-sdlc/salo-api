@@ -14,12 +14,12 @@ import java.util.Collection;
 @RequestMapping("/organization")
 public class OrganizationRest {
 
-  ScmResolver scmResolver;
+    ScmResolver scmResolver;
 
-  @GetMapping
-  public Collection<Organization> findAll(Principal principal) {
-    return this.scmResolver.resolve(principal).findAllOrganizations();
-  }
+    @GetMapping
+    public Collection<Organization> findAll(Principal principal) {
+        return this.scmResolver.resolve(principal).findAllOrganizations();
+    }
 
 }
 

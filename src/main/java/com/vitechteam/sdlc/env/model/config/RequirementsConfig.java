@@ -13,19 +13,19 @@ import java.util.Map;
 @JsonPropertyOrder(alphabetic = true)
 public class RequirementsConfig {
 
-  Map<String, Object> unknownFields =  new HashMap<>();
+    Map<String, Object> unknownFields = new HashMap<>();
 
-  List<EnvironmentConfig> environments;
-  IngressConfig ingress;
+    List<EnvironmentConfig> environments;
+    IngressConfig ingress;
 
-  @JsonAnyGetter
-  public Map<String, Object> getUnknownFields() {
-    return unknownFields;
-  }
+    @JsonAnyGetter
+    public Map<String, Object> getUnknownFields() {
+        return unknownFields;
+    }
 
-  @JsonAnySetter
-  public void setUnknownField(String name, Object value) {
-    unknownFields.put(name, value);
-  }
+    @JsonAnySetter
+    public void setUnknownField(String name, Object value) {
+        unknownFields.put(name, value);
+    }
 
 }

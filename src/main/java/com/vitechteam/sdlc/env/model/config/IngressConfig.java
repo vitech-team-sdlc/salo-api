@@ -16,32 +16,32 @@ import java.util.Map;
 @Builder
 public class IngressConfig {
 
-  boolean externalDNS;
-  @JsonProperty("cloud_dns_secret_name")
-  String cloudDNSSecretName;
-  String domain;
-  boolean ignoreLoadBalancer;
-  String namespaceSubDomain;
-  TLSConfig tLS;
-  Map<String, String> annotations;
+    boolean externalDNS;
+    @JsonProperty("cloud_dns_secret_name")
+    String cloudDNSSecretName;
+    String domain;
+    boolean ignoreLoadBalancer;
+    String namespaceSubDomain;
+    TLSConfig tLS;
+    Map<String, String> annotations;
 
-  public IngressConfig(boolean externalDNS, String domain, TLSConfig tLS) {
-    this.externalDNS = externalDNS;
-    this.domain = domain;
-    this.tLS = tLS;
-  }
+    public IngressConfig(boolean externalDNS, String domain, TLSConfig tLS) {
+        this.externalDNS = externalDNS;
+        this.domain = domain;
+        this.tLS = tLS;
+    }
 
-  @Value
-  @Builder
-  @Jacksonized
-  public static class TLSConfig {
-    boolean enabled;
-    String email;
-    // Production false uses self-signed certificates from the LetsEncrypt staging server, true enables the production
-    // server which incurs higher rate limiting https://letsencrypt.org/docs/rate-limits/
-    boolean production;
-    // SecretName the name of the secret which contains the TLS certificate
-    String secretName;
-  }
+    @Value
+    @Builder
+    @Jacksonized
+    public static class TLSConfig {
+        boolean enabled;
+        String email;
+        // Production false uses self-signed certificates from the LetsEncrypt staging server, true enables the production
+        // server which incurs higher rate limiting https://letsencrypt.org/docs/rate-limits/
+        boolean production;
+        // SecretName the name of the secret which contains the TLS certificate
+        String secretName;
+    }
 
 }

@@ -18,38 +18,38 @@ import java.util.Map;
 @RequestMapping("oauth")
 public class OAuthApi {
 
-  private final OAuth2ResourceServerProperties oAuth2ResourceServerProperties;
-  private final RestTemplate restTemplate;
+    private final OAuth2ResourceServerProperties oAuth2ResourceServerProperties;
+    private final RestTemplate restTemplate;
 
-  @Autowired
-  public OAuthApi(OAuth2ResourceServerProperties oAuth2ResourceServerProperties) {
-    this.oAuth2ResourceServerProperties = oAuth2ResourceServerProperties;
-    this.restTemplate = new RestTemplateBuilder().rootUri("https://github.com/").build();
-  }
+    @Autowired
+    public OAuthApi(OAuth2ResourceServerProperties oAuth2ResourceServerProperties) {
+        this.oAuth2ResourceServerProperties = oAuth2ResourceServerProperties;
+        this.restTemplate = new RestTemplateBuilder().rootUri("https://github.com/").build();
+    }
 
-  public OAuthApi(OAuth2ResourceServerProperties oAuth2ResourceServerProperties, RestTemplate restTemplate) {
-    this.oAuth2ResourceServerProperties = oAuth2ResourceServerProperties;
-    this.restTemplate = restTemplate;
-  }
+    public OAuthApi(OAuth2ResourceServerProperties oAuth2ResourceServerProperties, RestTemplate restTemplate) {
+        this.oAuth2ResourceServerProperties = oAuth2ResourceServerProperties;
+        this.restTemplate = restTemplate;
+    }
 
-  @RequestMapping(value = "/access_token", method = {
-    RequestMethod.POST,
-    RequestMethod.GET,
-    RequestMethod.PATCH,
-    RequestMethod.PUT
-  })
-  public GitHubAccessToken accessToken(@RequestParam String code) {
-    return this.restTemplate
-      .postForObject(
-        "/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}",
-        null,
-        GitHubAccessToken.class,
-        Map.of(
-          "client_id", this.oAuth2ResourceServerProperties.getOpaquetoken().getClientId(),
-          "client_secret", this.oAuth2ResourceServerProperties.getOpaquetoken().getClientSecret(),
-          "code", code
-        )
-      );
-  }
+    @RequestMapping(value = "/access_token", method = {
+            RequestMethod.POST,
+            RequestMethod.GET,
+            RequestMethod.PATCH,
+            RequestMethod.PUT
+    })
+    public GitHubAccessToken accessToken(@RequestParam String code) {
+        return this.restTemplate
+                .postForObject(
+                        "/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}",
+                        null,
+                        GitHubAccessToken.class,
+                        Map.of(
+                                "client_id", this.oAuth2ResourceServerProperties.getOpaquetoken().getClientId(),
+                                "client_secret", this.oAuth2ResourceServerProperties.getOpaquetoken().getClientSecret(),
+                                "code", code
+                        )
+                );
+    }
 
 }

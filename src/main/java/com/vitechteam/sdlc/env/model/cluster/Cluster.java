@@ -14,21 +14,21 @@ import java.util.List;
 @Builder
 @Jacksonized
 public class Cluster {
-  @With
-  String name;
-  @With
-  String jxBotUsername;
-  @JsonIgnore
-  String cloudProviderClientId;
-  @JsonIgnore
-  String cloudProviderSecret;
-  String cloudProfile;
-  String region;
-  Collection<NodeGroup> nodeGroups;
-  @With
-  Repository repository;
+    @With
+    String name;
+    @With
+    String jxBotUsername;
+    @JsonIgnore
+    String cloudProviderClientId;
+    @JsonIgnore
+    String cloudProviderSecret;
+    String cloudProfile;
+    String region;
+    Collection<NodeGroup> nodeGroups;
+    @With
+    Repository repository;
 
-  public static Cluster of(NodeGroup... nodeGroups){
-    return Cluster.builder().nodeGroups(List.of(nodeGroups)).build();
-  }
+    public static Cluster of(NodeGroup... nodeGroups) {
+        return Cluster.builder().nodeGroups(List.of(nodeGroups)).build();
+    }
 }

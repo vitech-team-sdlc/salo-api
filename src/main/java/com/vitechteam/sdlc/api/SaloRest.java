@@ -20,22 +20,22 @@ import java.util.Collection;
 @RequestMapping("/salo")
 public class SaloRest {
 
-  ScmResolver scmResolver;
-  SaloTemplates saloTemplates;
+    ScmResolver scmResolver;
+    SaloTemplates saloTemplates;
 
-  @PostMapping("{organization}")
-  public Salo save(
-    @RequestBody Salo salo,
-    @PathVariable String organization,
-    Principal principal
-  ) {
-    log.info("starting salo creation for org: {}", organization);
-    return this.scmResolver.getSaloService(principal).save(salo);
-  }
+    @PostMapping("{organization}")
+    public Salo save(
+            @RequestBody Salo salo,
+            @PathVariable String organization,
+            Principal principal
+    ) {
+        log.info("starting salo creation for org: {}", organization);
+        return this.scmResolver.getSaloService(principal).save(salo);
+    }
 
-  @GetMapping("/{organization}/templates")
-  public Collection<Salo> save(@PathVariable String organization) {
-    return this.saloTemplates.templates(organization);
-  }
+    @GetMapping("/{organization}/templates")
+    public Collection<Salo> save(@PathVariable String organization) {
+        return this.saloTemplates.templates(organization);
+    }
 
 }

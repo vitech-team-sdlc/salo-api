@@ -13,11 +13,11 @@ import java.security.Principal;
 @RequestMapping("user")
 public class UserRest {
 
-  ScmResolver scmResolver;
+    ScmResolver scmResolver;
 
-  @GetMapping
-  User user(Principal principal){
-    return this.scmResolver.resolve(principal).currentUser();
-  }
+    @GetMapping
+    User user(Principal principal) {
+        return this.scmResolver.resolve(principal).currentUser();
+    }
 
 }

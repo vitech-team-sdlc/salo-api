@@ -5,6 +5,7 @@ import com.vitechteam.sdlc.env.model.Salo;
 import java.util.Collection;
 
 public interface SaloService {
-  Salo save(Salo salo);
-  Collection<Salo> findAll();
+    Salo save(Salo salo);
+
+    Collection<Salo> findAll();
 }

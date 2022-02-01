@@ -17,25 +17,25 @@ import org.springframework.security.oauth2.server.resource.introspection.OpaqueT
 @AllArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-  @Bean
-  @Profile("!dev")
-  public OpaqueTokenIntrospector oauthOpaqueTokenIntrospector(
-    OAuth2ResourceServerProperties oAuth2ResourceServerProperties
-  ) {
-    return new GitHubNimbusOpaqueTokenIntrospector(oAuth2ResourceServerProperties);
-  }
+    @Bean
+    @Profile("!dev")
+    public OpaqueTokenIntrospector oauthOpaqueTokenIntrospector(
+            OAuth2ResourceServerProperties oAuth2ResourceServerProperties
+    ) {
+        return new GitHubNimbusOpaqueTokenIntrospector(oAuth2ResourceServerProperties);
+    }
 
-  @Bean
-  @Profile("dev")
-  public OpaqueTokenIntrospector personalOpaqueTokenIntrospector(
-    OAuth2ResourceServerProperties oAuth2ResourceServerProperties
-  ) {
-    return new GitHubPersonalTokenIntrospector(oAuth2ResourceServerProperties);
-  }
+    @Bean
+    @Profile("dev")
+    public OpaqueTokenIntrospector personalOpaqueTokenIntrospector(
+            OAuth2ResourceServerProperties oAuth2ResourceServerProperties
+    ) {
+        return new GitHubPersonalTokenIntrospector(oAuth2ResourceServerProperties);
+    }
 
-  @Override
-  public void configure(HttpSecurity http) throws Exception {
-    // @formatter:off
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        // @formatter:off
     http
       .csrf().disable()
       .sessionManagement()
@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       .oauth2ResourceServer()
       .opaqueToken();
     // @formatter:on
-  }
+    }
 
 
 }

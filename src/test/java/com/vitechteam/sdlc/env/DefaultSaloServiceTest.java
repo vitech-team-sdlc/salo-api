@@ -17,35 +17,35 @@ import java.io.IOException;
 @ActiveProfiles("private")
 class DefaultSaloServiceTest implements SaloTestHelper {
 
-  @Value("${salo.testing.gh_token}")
-  private String ghToken;
+    @Value("${salo.testing.gh_token}")
+    private String ghToken;
 
-  @MediumTest
-  void testSave() throws IOException {
-    final GitHub gitHub = GitHub.connectUsingOAuth(ghToken);
-    final DefaultSaloService defaultSaloService = new DefaultSaloService(
-      new GitHubScm(
-        gitHub,
-        new CustomGithubClient(ghToken)
-      )
-    );
+    @MediumTest
+    void testSave() throws IOException {
+        final GitHub gitHub = GitHub.connectUsingOAuth(ghToken);
+        final DefaultSaloService defaultSaloService = new DefaultSaloService(
+                new GitHubScm(
+                        gitHub,
+                        new CustomGithubClient(ghToken)
+                )
+        );
 
-    dropRepositories(gitHub);
+        dropRepositories(gitHub);
 
-    Assertions.assertNotNull(defaultSaloService.save(newDummySalo("test")));
-  }
-
-  private void dropRepositories(GitHub gitHub) {
-    try {
-      gitHub.getRepository("vitech-team-sdlc/infra-test-DEV").delete();
-    } catch (Throwable e) {
-      System.out.println(e.getMessage());
+        Assertions.assertNotNull(defaultSaloService.save(newDummySalo("test")));
     }
-    try {
-      gitHub.getRepository("vitech-team-sdlc/env-test-DEV").delete();
-    } catch (Throwable e) {
-      System.out.println(e.getMessage());
+
+    private void dropRepositories(GitHub gitHub) {
+        try {
+            gitHub.getRepository("vitech-team-sdlc/infra-test-DEV").delete();
+        } catch (Throwable e) {
+            System.out.println(e.getMessage());
+        }
+        try {
+            gitHub.getRepository("vitech-team-sdlc/env-test-DEV").delete();
+        } catch (Throwable e) {
+            System.out.println(e.getMessage());
+        }
     }
-  }
 
 }

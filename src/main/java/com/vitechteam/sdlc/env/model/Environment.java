@@ -8,33 +8,33 @@ import com.vitechteam.sdlc.scm.Repository;
 import java.util.List;
 
 public record Environment(
-  Cluster cluster,
-  EnvironmentConfig config
+        Cluster cluster,
+        EnvironmentConfig config
 ) {
 
-  public Environment(EnvironmentConfig config) {
-    this(null, config);
-  }
+    public Environment(EnvironmentConfig config) {
+        this(null, config);
+    }
 
-  public boolean needsEnvironmentRepoCreation() {
-    return isDev() || config.remoteCluster();
-  }
+    public boolean needsEnvironmentRepoCreation() {
+        return isDev() || config.remoteCluster();
+    }
 
-  @JsonIgnore
-  public boolean isDev() {
-    return "DEV".equals(config.key());
-  }
+    @JsonIgnore
+    public boolean isDev() {
+        return "DEV".equals(config.key());
+    }
 
-  public Repository envRepository() {
-    return new Repository(
-      config.repository(),
-      config.owner(),
-      Repository.DEFAULT_BRANCH,
-      config.gitURL()
-    );
-  }
+    public Repository envRepository() {
+        return new Repository(
+                config.repository(),
+                config.owner(),
+                Repository.DEFAULT_BRANCH,
+                config.gitURL()
+        );
+    }
 
-  public static List<Environment> of(Environment... environments) {
-    return List.of(environments);
-  }
+    public static List<Environment> of(Environment... environments) {
+        return List.of(environments);
+    }
 }

@@ -34,9 +34,7 @@ public class OAuthApi {
 
     @RequestMapping(value = "/access_token", method = {
             RequestMethod.POST,
-            RequestMethod.GET,
-            RequestMethod.PATCH,
-            RequestMethod.PUT
+            RequestMethod.GET
     })
     public GitHubAccessToken accessToken(@RequestParam String code) {
         return this.restTemplate

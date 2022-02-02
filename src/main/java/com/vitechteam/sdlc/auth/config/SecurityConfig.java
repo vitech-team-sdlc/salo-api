@@ -36,19 +36,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         // @formatter:off
-    http
-      .csrf().disable()
-      .sessionManagement()
-      .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-      .and()
-        .authorizeRequests()
-          .antMatchers("/oauth/**").permitAll()
-          .anyRequest().authenticated()
-      .and()
-      .oauth2ResourceServer()
-      .opaqueToken();
-    // @formatter:on
+        http
+                .csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                    .authorizeRequests()
+                        .antMatchers("/oauth/**").permitAll()
+                        .antMatchers("/swagger-ui*/**").permitAll()
+                        .antMatchers("/api-docs**").permitAll()
+                    .anyRequest().authenticated()
+                .and()
+                    .oauth2ResourceServer()
+                    .opaqueToken();
+        // @formatter:on
     }
-
 
 }

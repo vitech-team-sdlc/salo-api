@@ -6,3 +6,10 @@ spring:
           introspection-uri: https://api.github.com/applications/Iv1.94657f4b86f3738d/token
           client-id: Iv1.94657f4b86f3738d
           client-secret: ${GH_CLIENT_SECRET:INVALID_DEFAULT_GH_SECRET}
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    enabled: true

@@ -49,6 +49,9 @@ dependencies {
   testImplementation 'org.testcontainers:junit-jupiter'
   implementation group: 'org.kohsuke', name: 'github-api', version: '1.301'
 
+  implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.6.5'
+  implementation 'org.springdoc:springdoc-openapi-ui:1.6.5'
+
 //  implementation 'io.jsonwebtoken:jjwt:0.9.1'
 //  implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
 }

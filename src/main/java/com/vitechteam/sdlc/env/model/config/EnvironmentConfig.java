@@ -1,5 +1,9 @@
 package com.vitechteam.sdlc.env.model.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.Objects;
+
 public record EnvironmentConfig(
         String key,
         String owner,
@@ -14,5 +18,10 @@ public record EnvironmentConfig(
 
     public EnvironmentConfig(String key, PromotionStrategy promotionStrategy) {
         this(key, null, null, null, null, null, false, promotionStrategy, null);
+    }
+
+    @JsonIgnore
+    public boolean isDev(){
+        return Objects.equals(this.key.toLowerCase(), "dev");
     }
 }

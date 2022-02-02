@@ -38,7 +38,7 @@ public interface Scm {
 
     Collection<Organization> findAllOrganizations();
 
-    Collection<Repository> findAllRepositories();
+    Collection<Repository> findRepositoriesByOrg(String organization);
 
     Repository create(Repository newRepo, Repository template);
 

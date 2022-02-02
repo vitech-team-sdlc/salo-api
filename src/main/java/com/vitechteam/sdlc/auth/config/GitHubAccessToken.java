@@ -1,4 +1,4 @@
-package com.vitechteam.sdlc.api.config;
+package com.vitechteam.sdlc.auth.config;
 
 import lombok.Builder;
 import lombok.Value;

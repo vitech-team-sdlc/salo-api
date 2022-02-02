@@ -18,7 +18,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Organizations
-GET localhost:8080/organization
+GET localhost:8080/user/organization
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

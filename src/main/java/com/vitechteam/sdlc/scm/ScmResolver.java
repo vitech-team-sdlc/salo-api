@@ -1,9 +1,7 @@
-package com.vitechteam.sdlc.api;
+package com.vitechteam.sdlc.scm;
 
 import com.vitechteam.sdlc.env.DefaultSaloService;
 import com.vitechteam.sdlc.env.SaloService;
-import com.vitechteam.sdlc.scm.Scm;
-import com.vitechteam.sdlc.scm.ScmProvider;
 import com.vitechteam.sdlc.scm.github.CustomGithubClient;
 import com.vitechteam.sdlc.scm.github.GitHubScm;
 import lombok.SneakyThrows;

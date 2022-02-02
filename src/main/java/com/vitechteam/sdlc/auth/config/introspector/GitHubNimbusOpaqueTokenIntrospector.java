@@ -1,4 +1,4 @@
-package com.vitechteam.sdlc.api.config.introspector;
+package com.vitechteam.sdlc.auth.config.introspector;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vitechteam.sdlc.scm.ScmProvider;
@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.security.oauth2.server.resource.introspection.NimbusOpaqueTokenIntrospector;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 
@@ -19,20 +20,24 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
-public class GitHubPersonalTokenIntrospector extends NimbusOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
+public class GitHubNimbusOpaqueTokenIntrospector extends NimbusOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 
-    public GitHubPersonalTokenIntrospector(OAuth2ResourceServerProperties properties) {
+    public GitHubNimbusOpaqueTokenIntrospector(OAuth2ResourceServerProperties oAuth2ResourceServerProperties) {
         super(
-                properties.getOpaquetoken().getIntrospectionUri(),
+                oAuth2ResourceServerProperties.getOpaquetoken().getIntrospectionUri(),
                 new RestTemplateBuilder()
-                        .defaultHeader(HttpHeaders.AUTHORIZATION, properties.getOpaquetoken().getClientId() + " " + properties.getOpaquetoken().getClientSecret())
+                        .additionalInterceptors(new BasicAuthenticationInterceptor(
+                                oAuth2ResourceServerProperties.getOpaquetoken().getClientId(),
+                                oAuth2ResourceServerProperties.getOpaquetoken().getClientSecret()
+                        ))
                         .additionalInterceptors(getClientHttpRequestInterceptor())
                         .build()
         );
         setRequestEntityConverter(githubIntrospectMsgConverter(
-                URI.create(properties.getOpaquetoken().getIntrospectionUri())
+                URI.create(oAuth2ResourceServerProperties.getOpaquetoken().getIntrospectionUri())
         ));
     }
 
@@ -62,8 +67,12 @@ public class GitHubPersonalTokenIntrospector extends NimbusOpaqueTokenIntrospect
         return token -> {
             final var headers = new HttpHeaders();
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-            return new RequestEntity<>("", headers, HttpMethod.GET, introspectionUri);
+
+            final Map<String, String> body = new HashMap<>();
+            body.put("access_token", token);
+            return new RequestEntity<>(body, headers, HttpMethod.POST, introspectionUri);
         };
     }
+
 
 }

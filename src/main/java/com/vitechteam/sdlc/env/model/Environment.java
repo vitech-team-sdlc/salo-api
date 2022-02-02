@@ -34,7 +34,7 @@ public record Environment(
         );
     }
 
-    public static List<Environment> of(Environment... environments) {
+    public static List<Environment> list(Environment... environments) {
         return List.of(environments);
     }
 }

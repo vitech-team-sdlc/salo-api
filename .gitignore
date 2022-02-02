@@ -39,3 +39,4 @@ out/
 **.private.yaml
 **-private.yaml
 **.private.env.json
+**-testprivate.yaml

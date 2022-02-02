@@ -1,8 +1,10 @@
 package com.vitechteam.sdlc.env;
 
+import com.vitechteam.sdlc.env.model.CloudProvider;
 import com.vitechteam.sdlc.env.model.Environment;
 import com.vitechteam.sdlc.env.model.Salo;
 import com.vitechteam.sdlc.env.model.cluster.Cluster;
+import com.vitechteam.sdlc.env.model.cluster.NodeGroup;
 import com.vitechteam.sdlc.env.model.config.EnvironmentConfig;
 import com.vitechteam.sdlc.env.model.config.IngressConfig;
 import com.vitechteam.sdlc.env.model.config.JxRequirements;
@@ -12,11 +14,12 @@ import com.vitechteam.sdlc.scm.Scm;
 import com.vitechteam.sdlc.scm.UpdateInfrastructureParams;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.NotImplementedException;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Log4j2
@@ -134,13 +137,97 @@ public class DefaultSaloService implements SaloService {
         final TfVars tfVars = this.scm.getTfVars(repository);
         tfVars.mergeWith(newEnvironment, ingress);
         this.scm.updateTfVars(tfVars, repository);
+
         log.info("new tf vars generated for {} salo: {}", repository.fullName(), salo.name());
 
         return newEnvironment;
     }
 
     @Override
-    public Collection<Salo> findAll() {
-        throw new NotImplementedException();
+    public Collection<Salo> findByOrganization(String organization) {
+        final Collection<Repository> repositories = this.scm.findRepositoriesByOrg(organization);
+        return repositories.stream()
+                .filter(this::isDev)
+                .map(envRepo -> {
+                    final JxRequirements jxRequirements = this.scm.getJxRequirements(envRepo);
+                    final String saloName = parseSaloName(envRepo);
+                    final List<Environment> environments = jxRequirements
+                            .spec()
+                            .getEnvironments()
+                            .stream()
+                            .filter(ec -> ec.remoteCluster() || ec.isDev())
+                            .map(jxEnv -> {
+                                final Cluster cluster = findCluster(saloName, jxEnv, repositories);
+                                return new Environment(cluster, jxEnv);
+                            })
+                            .toList();
+                    if (environments.isEmpty()) {
+                        throw new IllegalStateException("incorrect env configuration, envs can't be empty");
+                    }
+                    return new Salo(
+                            saloName,
+                            CloudProvider.AWS,
+                            organization,
+                            jxRequirements.spec().getIngress(),
+                            environments
+                    );
+                })
+                .toList();
+    }
+
+    @Override
+    public Optional<Salo> findByNameAndOrg(String saloName, String organization) {
+        return this.findByOrganization(organization)
+                .stream()
+                .filter(s -> s.name().equals(saloName))
+                .findFirst();
+    }
+
+    @Nonnull
+    private Cluster findCluster(String saloName, EnvironmentConfig environmentConfig, Collection<Repository> repositories) {
+        final String lookingForName = String.format("infra-%s-%s", saloName, environmentConfig.key());
+        final Repository infraRepo = repositories
+                .stream()
+                .filter(r -> r.name().equals(lookingForName))
+                .findFirst()
+                .orElseThrow(() -> new InfraRepositoryNotFound(String.format(
+                        "can't find infra repository for installation: %s by name %s", saloName, lookingForName)
+                ));
+
+        final TfVars tfVars = this.scm.getTfVars(infraRepo);
+        final List<NodeGroup> nodeGroups = new ArrayList<>();
+        tfVars.getWorkers().forEach((name, worker) -> nodeGroups.add(new NodeGroup(
+                name,
+                worker.getAsgMaxSize(),
+                worker.getAsgMinSize(),
+                worker.getAsgMaxSize() - worker.getOnDemandBaseCapacity(),
+                worker.getK8SLabels(),
+                worker.getK8STaints(),
+                worker.getTags(),
+                worker.getRootVolumeSize(),
+                worker.getOverrideInstanceTypes()
+        )));
+
+        return Cluster.builder()
+                .name(tfVars.getClusterName())
+                .jxBotUsername(tfVars.getJxBotUsername())
+                .region(tfVars.getRegion())
+                .nodeGroups(nodeGroups)
+                .repository(infraRepo)
+                .build();
+    }
+
+    private boolean isDev(Repository repo) {
+        return repo.name().startsWith("env-") && repo.name().endsWith("DEV");
+    }
+
+    private String parseSaloName(Repository repo) {
+        return repo.name().split("-")[1];
+    }
+
+    private static class InfraRepositoryNotFound extends RuntimeException {
+        public InfraRepositoryNotFound(String message) {
+            super(message);
+        }
     }
 }

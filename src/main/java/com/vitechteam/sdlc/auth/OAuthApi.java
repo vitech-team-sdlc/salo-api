@@ -1,6 +1,6 @@
-package com.vitechteam.sdlc.api;
+package com.vitechteam.sdlc.auth;
 
-import com.vitechteam.sdlc.api.config.GitHubAccessToken;
+import com.vitechteam.sdlc.auth.config.GitHubAccessToken;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;

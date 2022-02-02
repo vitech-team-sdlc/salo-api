@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vitechteam.sdlc.SaloTestHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 class SaloTest implements SaloTestHelper {
 
@@ -17,6 +16,5 @@ class SaloTest implements SaloTestHelper {
                 .writerWithDefaultPrettyPrinter()
                 .writeValueAsString(serialization);
         Assertions.assertFalse(json.trim().isEmpty());
-        System.out.println(json);
     }
 }

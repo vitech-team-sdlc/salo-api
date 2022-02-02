@@ -1,4 +1,4 @@
-package com.vitechteam.sdlc.api.config.introspector;
+package com.vitechteam.sdlc.auth.config.introspector;
 
 import lombok.Value;
 import org.springframework.http.HttpHeaders;

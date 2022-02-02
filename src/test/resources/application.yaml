@@ -1,3 +1,5 @@
-salo:
-  testing:
-    gh_token: ${GH_TOKEN}
+spring:
+  profiles:
+    active: dev,private,testprivate
+
+ghTestToken: ${GH_TEST_TOKEN}

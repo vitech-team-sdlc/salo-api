@@ -24,6 +24,7 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -43,10 +44,12 @@ public class GitHubScm implements Scm {
     private final ObjectMapper jsonMapper;
 
     public GitHubScm(GitHub gitHub, CustomGithubClient customGithubClient) {
-        this.gitHub = gitHub;
-        this.customGithubClient = customGithubClient;
-        this.yamlMapper = new ObjectMapper(new YAMLFactory());
-        this.jsonMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this(
+                gitHub,
+                customGithubClient,
+                new ObjectMapper(new YAMLFactory()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false),
+                new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        );
     }
 
     @Override
@@ -88,8 +91,15 @@ public class GitHubScm implements Scm {
 
     @SneakyThrows
     @Override
-    public Collection<Repository> findAllRepositories() {
-        return gitHub.getMyself().getAllRepositories().values().stream().map(this::toRepository).toList();
+    public Collection<Repository> findRepositoriesByOrg(@Nonnull String organization) {
+        return this.gitHub
+                .getMyself()
+                .getAllRepositories()
+                .values()
+                .stream()
+                .filter(r -> r.getOwnerName().equals(organization))
+                .map(this::toRepository)
+                .toList();
     }
 
     @Override

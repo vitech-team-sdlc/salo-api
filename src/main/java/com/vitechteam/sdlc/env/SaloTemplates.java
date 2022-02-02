@@ -32,7 +32,7 @@ public class SaloTemplates {
                         CloudProvider.AWS,
                         organization,
                         ingressConfig,
-                        Environment.of(
+                        Environment.list(
                                 new Environment(Cluster.of(nodeMain(), nodePipeline()), createEnvironmentConfig("DEV", PromotionStrategy.Auto)),
                                 new Environment(createEnvironmentConfig("STG", PromotionStrategy.Manual)),
                                 new Environment(createEnvironmentConfig("PRD", PromotionStrategy.Manual))
@@ -43,7 +43,7 @@ public class SaloTemplates {
                         CloudProvider.AWS,
                         organization,
                         ingressConfig,
-                        Environment.of(
+                        Environment.list(
                                 new Environment(Cluster.of(nodeMain(), nodePipeline()), createEnvironmentConfig("DEV", PromotionStrategy.Auto)),
                                 new Environment(createEnvironmentConfig("STG", PromotionStrategy.Auto)),
                                 new Environment(createEnvironmentConfig("PRE-PRD", PromotionStrategy.Manual)),

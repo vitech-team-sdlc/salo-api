@@ -1,7 +1,7 @@
-package com.vitechteam.sdlc.api;
+package com.vitechteam.sdlc.env;
 
-import com.vitechteam.sdlc.env.SaloTemplates;
 import com.vitechteam.sdlc.env.model.Salo;
+import com.vitechteam.sdlc.scm.ScmResolver;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +22,14 @@ public class SaloRest {
 
     ScmResolver scmResolver;
     SaloTemplates saloTemplates;
+
+    @GetMapping("{organization}")
+    public Collection<Salo> findAll(
+            Principal principal,
+            @PathVariable String organization
+    ) {
+        return this.scmResolver.getSaloService(principal).findByOrganization(organization);
+    }
 
     @PostMapping("{organization}")
     public Salo save(

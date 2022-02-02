@@ -1,8 +1,8 @@
 
-package com.vitechteam.sdlc.api.config;
+package com.vitechteam.sdlc.auth.config;
 
-import com.vitechteam.sdlc.api.config.introspector.GitHubNimbusOpaqueTokenIntrospector;
-import com.vitechteam.sdlc.api.config.introspector.GitHubPersonalTokenIntrospector;
+import com.vitechteam.sdlc.auth.config.introspector.GitHubNimbusOpaqueTokenIntrospector;
+import com.vitechteam.sdlc.auth.config.introspector.GitHubPersonalTokenIntrospector;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.context.annotation.Bean;

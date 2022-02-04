@@ -4,6 +4,7 @@ import com.vitechteam.sdlc.env.model.config.JxRequirements;
 import com.vitechteam.sdlc.env.model.tf.TfVars;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface Scm {
 
@@ -59,4 +60,8 @@ public interface Scm {
     File updateFile(File file, Repository repository, String commitMessage);
 
     void triggerInfrastructureUpdate(Repository repository, UpdateInfrastructureParams updateInfrastructureParams);
+
+    Optional<PipelineStatus> getLatestPipelineStatus(Repository repo, String pipeline);
+
+    Optional<PipelineStatus> getLatestInfraPipelineStatus(Repository repo);
 }

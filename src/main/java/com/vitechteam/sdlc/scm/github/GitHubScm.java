@@ -7,6 +7,7 @@ import com.vitechteam.sdlc.env.model.config.JxRequirements;
 import com.vitechteam.sdlc.env.model.tf.TfVars;
 import com.vitechteam.sdlc.scm.File;
 import com.vitechteam.sdlc.scm.Organization;
+import com.vitechteam.sdlc.scm.PipelineStatus;
 import com.vitechteam.sdlc.scm.ScmProvider;
 import com.vitechteam.sdlc.scm.Repository;
 import com.vitechteam.sdlc.scm.Scm;
@@ -22,6 +23,7 @@ import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHOrganization;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
+import org.kohsuke.github.GHWorkflowRun;
 import org.kohsuke.github.GitHub;
 
 import javax.annotation.Nonnull;
@@ -30,6 +32,7 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class GitHubScm implements Scm {
@@ -193,6 +196,30 @@ public class GitHubScm implements Scm {
                         "destroyInfra", Boolean.toString(params.destroy()),
                         "applyInfra", Boolean.toString(params.apply())
                 ));
+    }
+
+    @SneakyThrows
+    @Override
+    public Optional<PipelineStatus> getLatestPipelineStatus(@Nonnull Repository repo, @Nonnull String pipeline) {
+        return this.gitHub
+                .getRepository(repo.fullName())
+                .getWorkflow(pipeline)
+                .listRuns()
+                .withPageSize(1)
+                .toList()
+                .stream()
+                .map(ghRun -> new PipelineStatus(
+                        ghRun.getStatus().name(),
+                        Optional.ofNullable(ghRun.getConclusion()).map(GHWorkflowRun.Conclusion::name).orElse(null),
+                        ghRun.getLogsUrl().toString(),
+                        ghRun.getHeadSha()
+                ))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<PipelineStatus> getLatestInfraPipelineStatus(Repository repo) {
+        return getLatestPipelineStatus(repo, "main.yml");
     }
 
     private Repository toRepository(GHRepository ghRepository) {

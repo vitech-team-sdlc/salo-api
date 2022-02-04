@@ -31,6 +31,24 @@ public class SaloRest {
         return this.scmResolver.getSaloService(principal).findByOrganization(organization);
     }
 
+    @GetMapping("{organization}/{name}")
+    public Salo findAll(
+            Principal principal,
+            @PathVariable String organization,
+            @PathVariable String name
+    ) {
+        return this.scmResolver.getSaloService(principal).findByNameAndOrg(name, organization);
+    }
+
+    @GetMapping("{organization}/{name}/status")
+    public Salo findStatus(
+            Principal principal,
+            @PathVariable String organization,
+            @PathVariable String name
+    ) {
+        return this.scmResolver.getSaloService(principal).findStatusByNameAndOrg(name, organization);
+    }
+
     @PostMapping("{organization}")
     public Salo save(
             @RequestBody Salo salo,

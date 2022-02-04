@@ -2,9 +2,9 @@
 
 ## Initial configuration
 
-For local setup create new spring config file called  `application-private.yaml` with next content for [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) access:
+For local setup create new spring config file called  `src/main/resources/application-private.yaml`.
 
-### Personal access token auth
+### [Personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) auth
 ```yaml
 spring:
   security:

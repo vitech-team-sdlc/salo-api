@@ -6,15 +6,17 @@ import com.vitechteam.sdlc.env.model.config.EnvironmentConfig;
 import com.vitechteam.sdlc.scm.PipelineStatus;
 import com.vitechteam.sdlc.scm.Repository;
 import lombok.Builder;
-import lombok.With;
 
 import java.util.List;
+
 @Builder
 public record Environment(
         Cluster cluster,
         EnvironmentConfig config,
         Status status
 ) {
+
+    public static final String DEV_ENV_KEY = "dev";
 
     public Environment(Cluster cluster, EnvironmentConfig config) {
         this(cluster, config, null);
@@ -30,7 +32,7 @@ public record Environment(
 
     @JsonIgnore
     public boolean isDev() {
-        return "DEV".equals(config.key());
+        return DEV_ENV_KEY.equals(config.key());
     }
 
     public Repository envRepository() {
@@ -38,7 +40,7 @@ public record Environment(
                 config.repository(),
                 config.owner(),
                 Repository.DEFAULT_BRANCH,
-                config.gitURL()
+                config.gitUrl()
         );
     }
 
@@ -48,7 +50,7 @@ public record Environment(
 
     public record Status(
             PipelineStatus infraPipelineStatus
-    ){
+    ) {
 
     }
 }

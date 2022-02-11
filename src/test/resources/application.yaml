@@ -2,4 +2,10 @@ spring:
   profiles:
     active: dev,private,testprivate
 
-ghTestToken: ${GH_TEST_TOKEN}
+largeTest:
+  github:
+    testToken: ${GH_TEST_TOKEN}
+    organization: vitech-team-sdlc
+  aws:
+    clientId: ${AWS_TEST_CLIENT_ID}
+    secret: ${AWS_TEST_SECRET}

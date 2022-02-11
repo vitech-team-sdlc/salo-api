@@ -1,6 +1,6 @@
 package com.vitechteam.sdlc.env.model.cluster;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vitechteam.sdlc.scm.Repository;
 import lombok.Builder;
 import lombok.Value;
@@ -18,10 +18,11 @@ public class Cluster {
     String name;
     @With
     String jxBotUsername;
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     String cloudProviderClientId;
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     String cloudProviderSecret;
+    boolean domainOwner;
     String cloudProfile;
     String region;
     Collection<NodeGroup> nodeGroups;

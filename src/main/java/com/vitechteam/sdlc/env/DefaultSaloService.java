@@ -19,6 +19,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Log4j2
@@ -51,23 +52,28 @@ public class DefaultSaloService implements SaloService {
                 environments
         ));
 
-        triggerInfraCreation(salo);
-
         return salo;
     }
 
-    private void triggerInfraCreation(Salo salo) {
+    @Override
+    public void applyInfrastructure(Salo salo) {
+        triggerInfraPipeline(salo, true, false);
+    }
+
+    @Override
+    public void destroyInfrastructure(Salo salo) {
+        triggerInfraPipeline(salo, false, true);
+    }
+
+    private void triggerInfraPipeline(Salo salo, boolean doApply, boolean doDestroy) {
         salo
                 .environments()
                 .stream()
                 .filter(Environment::needsEnvironmentRepoCreation)
-                .forEach(env -> this.scm.triggerInfrastructureUpdate(
-                        env.cluster().getRepository(),
-                        new UpdateInfrastructureParams(
-                                env.cluster().getRegion(),
-                                false,
-                                false
-                        )
+                .map(Environment::cluster)
+                .forEach(cluster -> this.scm.triggerInfrastructureUpdate(
+                        cluster.getRepository(),
+                        new UpdateInfrastructureParams(cluster.getRegion(), doApply, doDestroy)
                 ));
     }
 
@@ -149,7 +155,7 @@ public class DefaultSaloService implements SaloService {
                 .filter(this::isDev)
                 .map(envRepo -> {
                     final JxRequirements jxRequirements = this.scm.getJxRequirements(envRepo);
-                    final String saloName = parseSaloName(envRepo);
+                    final String saloName = envRepo.saloName();
                     final List<Environment> environments = jxRequirements
                             .spec()
                             .getEnvironments()
@@ -175,37 +181,32 @@ public class DefaultSaloService implements SaloService {
     }
 
     @Override
-    public Salo findByNameAndOrg(String saloName, String organization) {
+    public Optional<Salo> findByNameAndOrg(String saloName, String organization) {
         return this.findByOrganization(organization)
                 .stream()
                 .filter(s -> s.name().equals(saloName))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(organization + "/" + saloName + " not found"));
-    }
-
-    private static class NotFoundException extends RuntimeException {
-        public NotFoundException(String message) {
-            super(message);
-        }
+                .findFirst();
     }
 
     @Override
-    public Salo findStatusByNameAndOrg(String name, String organization) {
-        final Salo salo = this.findByNameAndOrg(name, organization);
-        final List<Environment> environments = salo.environments().stream()
-                .filter(Environment::needsEnvironmentRepoCreation)
-                .map(env -> this.scm.getLatestInfraPipelineStatus(env.cluster().getRepository())
-                        .map(st -> new Environment(env.cluster(), env.config(), new Environment.Status(st)))
-                        .orElse(env)
-                )
-                .toList();
-        return new Salo(
-                salo.name(),
-                salo.cloudProvider(),
-                salo.organization(),
-                salo.ingressConfig(),
-                environments
-        );
+    public Optional<Salo> findStatusByNameAndOrg(String name, String organization) {
+        return this.findByNameAndOrg(name, organization)
+                .map(salo -> {
+                    final List<Environment> environments = salo.environments().stream()
+                            .filter(Environment::needsEnvironmentRepoCreation)
+                            .map(env -> this.scm.findLatestInfraPipelineStatus(env.cluster().getRepository())
+                                    .map(st -> new Environment(env.cluster(), env.config(), new Environment.Status(st)))
+                                    .orElse(env)
+                            )
+                            .toList();
+                    return new Salo(
+                            salo.name(),
+                            salo.cloudProvider(),
+                            salo.organization(),
+                            salo.ingressConfig(),
+                            environments
+                    );
+                });
     }
 
     @Nonnull
@@ -243,11 +244,7 @@ public class DefaultSaloService implements SaloService {
     }
 
     private boolean isDev(Repository repo) {
-        return repo.name().startsWith("env-") && repo.name().endsWith("DEV");
-    }
-
-    private String parseSaloName(Repository repo) {
-        return repo.name().split("-")[1];
+        return repo.name().startsWith("env-") && repo.name().endsWith(Environment.DEV_ENV_KEY);
     }
 
     private static class InfraRepositoryNotFound extends RuntimeException {

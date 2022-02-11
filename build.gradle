@@ -28,6 +28,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.springframework.boot:spring-boot-starter-web'
 
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -47,6 +49,7 @@ dependencies {
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
   testImplementation 'org.testcontainers:junit-jupiter'
+  testImplementation 'org.awaitility:awaitility:4.1.1'
   implementation group: 'org.kohsuke', name: 'github-api', version: '1.301'
 
   implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.6.5'

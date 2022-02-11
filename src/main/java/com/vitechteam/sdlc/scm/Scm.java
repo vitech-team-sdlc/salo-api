@@ -61,7 +61,9 @@ public interface Scm {
 
     void triggerInfrastructureUpdate(Repository repository, UpdateInfrastructureParams updateInfrastructureParams);
 
-    Optional<PipelineStatus> getLatestPipelineStatus(Repository repo, String pipeline);
+    Optional<PipelineStatus> findLatestPipelineStatus(Repository repo, String pipeline);
 
-    Optional<PipelineStatus> getLatestInfraPipelineStatus(Repository repo);
+    Optional<PipelineStatus> findLatestInfraPipelineStatus(Repository repo);
+
+    PipelineStatus getPipelineExecutionStatus(Repository repo, long executionId);
 }

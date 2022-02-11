@@ -33,8 +33,12 @@ public class TfVars {
     String apexDomain;
     @JsonProperty("subdomain")
     String subdomain;
+    @JsonProperty("domain_registered_in_same_aws_account")
+    boolean domainRegisteredInSameAwsAccount;
+
     @JsonProperty("production_letsencrypt")
-    String productionLetsencrypt;
+    boolean productionLetsencrypt;
+    @JsonProperty("enable_tls")
     boolean enableTls;
     @JsonProperty("tls_email")
     String tlsEmail;
@@ -103,10 +107,11 @@ public class TfVars {
         this.clusterName = String.format("%s-%s", cluster.getName(), environment.config().key());
         this.apexDomain = ingressConfig.getDomain();
         this.subdomain = cluster.getName();
+        this.domainRegisteredInSameAwsAccount = cluster.isDomainOwner();
 
         this.region = cluster.getRegion();
-        this.jxGitUrl = cluster.getRepository().url();
-        this.tlsEmail = ingressConfig.getTLS().getEmail();
+        this.jxGitUrl = environment.envRepository().url();
+        this.tlsEmail = ingressConfig.getTls().getEmail();
         this.enableTls = true;
         this.jxBotUsername = cluster.getJxBotUsername();
 
@@ -115,8 +120,8 @@ public class TfVars {
         cluster.getNodeGroups().forEach(node -> this.workers.put(node.name(), new Worker(
                 new HashMap<>(),
                 node.minSize(),
-                node.minSize(),
                 node.maxSize(),
+                node.minSize(),
                 node.labels(),
                 node.taints(),
                 node.maxSize() - node.spotSize(),

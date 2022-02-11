@@ -33,7 +33,7 @@ public class SaloTemplates {
                         organization,
                         ingressConfig,
                         Environment.list(
-                                new Environment(Cluster.of(nodeMain(), nodePipeline()), createEnvironmentConfig("DEV", PromotionStrategy.Auto)),
+                                new Environment(Cluster.of(nodeMain(), nodePipeline()), createEnvironmentConfig(Environment.DEV_ENV_KEY, PromotionStrategy.Auto)),
                                 new Environment(createEnvironmentConfig("STG", PromotionStrategy.Manual)),
                                 new Environment(createEnvironmentConfig("PRD", PromotionStrategy.Manual))
                         )
@@ -44,7 +44,7 @@ public class SaloTemplates {
                         organization,
                         ingressConfig,
                         Environment.list(
-                                new Environment(Cluster.of(nodeMain(), nodePipeline()), createEnvironmentConfig("DEV", PromotionStrategy.Auto)),
+                                new Environment(Cluster.of(nodeMain(), nodePipeline()), createEnvironmentConfig(Environment.DEV_ENV_KEY, PromotionStrategy.Auto)),
                                 new Environment(createEnvironmentConfig("STG", PromotionStrategy.Auto)),
                                 new Environment(createEnvironmentConfig("PRE-PRD", PromotionStrategy.Manual)),
                                 new Environment(createEnvironmentConfig("PRD", PromotionStrategy.Manual))

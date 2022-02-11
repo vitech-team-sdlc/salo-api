@@ -12,17 +12,98 @@ Accept: application/json
 
 > {% client.global.set("token", response.body.access_token); %}
 
-### Curerent logged user
-GET localhost:8080/user
+### Current logged user
+GET {{hostname}}/user
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{gh-token}}
 
-### Organizations
-GET localhost:8080/user/organization
+### Get List of all Sa10 instalations for the {{organization}}
+GET {{hostname}}/user/{{organization}}
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{gh-token}}
+
+### Get the {{name}} Sa10 instalations from the {{organization}}
+GET {{hostname}}/salo/{{organization}}/{{name}}
+Content-Type: application/json
+Authorization: Bearer {{gh-token}}
+
+### Get the {{name}} Sa10 installations status from the {{organization}}
+GET {{hostname}}/salo/{{organization}}/{{name}}/status
+Content-Type: application/json
+Authorization: Bearer {{gh-token}}
 
 ### Get List of Sa10 templates
-GET localhost:8080/salo/environment/templates
+GET {{hostname}}/salo/{{organization}}/templates
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{gh-token}}
+
+### Create a new Sa10 instalation in the {{organization}}
+POST {{hostname}}/salo/{{organization}}
+Content-Type: application/json
+Authorization: Bearer {{gh-token}}
+
+{
+  "name": "{{name}}",
+  "cloudProvider": "AWS",
+  "organization": "{{organization}}",
+  "ingressConfig": {
+    "domain": "sdlcvitech.com",
+    "tls": {
+      "email": "{{email}}"
+    }
+  },
+  "environments": [
+    {
+      "cluster": {
+        "name": "{{name}}-cluster",
+        "jxBotUsername": "{{gh-username}}",
+        "cloudProviderClientId": "{{aws-client-id}}",
+        "cloudProviderSecret": "{{aws-secret}}",
+        "domainOwner": true,
+        "region": "us-east-2",
+        "nodeGroups": [
+          {
+            "name": "pipelines",
+            "maxSize": 2,
+            "minSize": 1,
+            "spotSize": 1,
+            "labels": [],
+            "taints": [],
+            "tags": [],
+            "volumeSize": 60,
+            "vmTypes": [
+              "m5.xlarge"
+            ]
+          },
+          {
+            "name": "main",
+            "maxSize": 2,
+            "minSize": 1,
+            "spotSize": 1,
+            "labels": [],
+            "taints": [],
+            "tags": [],
+            "volumeSize": 60,
+            "vmTypes": [
+              "m5.xlarge"
+            ]
+          }
+        ]
+      },
+      "config": {
+        "key": "dev",
+        "promotionStrategy": "Auto"
+      }
+    }
+  ]
+}
+
+### Deploy Sa10 installation
+POST {{hostname}}/salo/{{organization}}/{{name}}/apply
+Content-Type: application/json
+Authorization: Bearer {{gh-token}}
+
+### Destroy Sa10 installation
+POST {{hostname}}/salo/{{organization}}/{{name}}/destroy
+Content-Type: application/json
+Authorization: Bearer {{gh-token}}

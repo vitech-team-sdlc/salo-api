@@ -1,16 +1,19 @@
 package com.vitechteam.sdlc.env.model.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.vitechteam.sdlc.env.model.Environment;
 
-import java.util.Objects;
-
+@JsonPropertyOrder(alphabetic = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record EnvironmentConfig(
         String key,
         String owner,
         String repository,
         String gitServer,
         String gitKind,
-        String gitURL,
+        String gitUrl,
         boolean remoteCluster,
         PromotionStrategy promotionStrategy,
         String namespace
@@ -21,7 +24,7 @@ public record EnvironmentConfig(
     }
 
     @JsonIgnore
-    public boolean isDev(){
-        return Objects.equals(this.key.toLowerCase(), "dev");
+    public boolean isDev() {
+        return Environment.DEV_ENV_KEY.equals(this.key);
     }
 }

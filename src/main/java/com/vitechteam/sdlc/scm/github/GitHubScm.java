@@ -138,7 +138,9 @@ public class GitHubScm implements Scm {
     @SneakyThrows
     @Override
     public JxRequirements updateJxRequirements(JxRequirements requirementsConfig, Repository envRepository) {
-        final String content = yamlMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requirementsConfig);
+        final String content = yamlMapper
+                .writerWithDefaultPrettyPrinter()
+                .writeValueAsString(requirementsConfig);
         final File file = updateFile(
                 new File(
                         content,
@@ -200,7 +202,7 @@ public class GitHubScm implements Scm {
 
     @SneakyThrows
     @Override
-    public Optional<PipelineStatus> getLatestPipelineStatus(@Nonnull Repository repo, @Nonnull String pipeline) {
+    public Optional<PipelineStatus> findLatestPipelineStatus(@Nonnull Repository repo, @Nonnull String pipeline) {
         return this.gitHub
                 .getRepository(repo.fullName())
                 .getWorkflow(pipeline)
@@ -208,18 +210,23 @@ public class GitHubScm implements Scm {
                 .withPageSize(1)
                 .toList()
                 .stream()
-                .map(ghRun -> new PipelineStatus(
-                        ghRun.getStatus().name(),
-                        Optional.ofNullable(ghRun.getConclusion()).map(GHWorkflowRun.Conclusion::name).orElse(null),
-                        ghRun.getLogsUrl().toString(),
-                        ghRun.getHeadSha()
-                ))
+                .map(this::toPipelineStatus)
                 .findFirst();
     }
 
     @Override
-    public Optional<PipelineStatus> getLatestInfraPipelineStatus(Repository repo) {
-        return getLatestPipelineStatus(repo, "main.yml");
+    public Optional<PipelineStatus> findLatestInfraPipelineStatus(Repository repo) {
+        return findLatestPipelineStatus(repo, "main.yml");
+    }
+
+    @SneakyThrows
+    @Override
+    public PipelineStatus getPipelineExecutionStatus(Repository repo, long executionId) {
+        return Optional.of(this.gitHub
+                .getRepository(repo.fullName())
+                .getWorkflowRun(executionId))
+                .map(this::toPipelineStatus)
+                .get();
     }
 
     private Repository toRepository(GHRepository ghRepository) {
@@ -233,5 +240,17 @@ public class GitHubScm implements Scm {
 
     private List<Organization> toOrganizations(Collection<GHOrganization> myOrganizations) {
         return myOrganizations.stream().map(ghOrg -> new Organization(ghOrg.getLogin())).toList();
+    }
+
+    private PipelineStatus toPipelineStatus(GHWorkflowRun ghRun) {
+        return new PipelineStatus(
+                ghRun.getId(),
+                ghRun.getStatus().name(),
+                Optional.ofNullable(ghRun.getConclusion())
+                        .map(GHWorkflowRun.Conclusion::name)
+                        .orElse(null),
+                ghRun.getLogsUrl().toString(),
+                ghRun.getHeadSha()
+        );
     }
 }

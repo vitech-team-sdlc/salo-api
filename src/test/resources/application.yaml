@@ -1,6 +1,13 @@
 spring:
   profiles:
     active: dev,private,testprivate
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          introspection-uri: https://api.github.com/user
+          client-id: token
+          client-secret: ${GH_TEST_TOKEN}
 
 largeTest:
   github:

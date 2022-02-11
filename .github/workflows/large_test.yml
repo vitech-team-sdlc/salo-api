@@ -1,0 +1,34 @@
+name: Run Large Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Java Setup
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Run Large Test
+        uses: gradle/gradle-build-action@v2.1.3
+        env:
+          GH_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          AWS_TEST_CLIENT_ID: ${{ secrets.AWS_TEST_CLIENT_ID }}
+          AWS_TEST_SECRET: ${{ secrets.AWS_TEST_SECRET }}
+        with:
+          gradle-executable: gradlew
+          arguments: test --tests "com.vitechteam.sdlc.env.DefaultSaloServiceTest"

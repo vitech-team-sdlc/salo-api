@@ -58,7 +58,7 @@ class DefaultSaloServiceTest implements TestFixtures {
     private Salo saloTemplate;
 
     private Salo salo;
-    private boolean safeToDropRepositories;
+    private boolean infraDestroyed;
 
     @BeforeAll
     public void beforeAll() throws IOException {
@@ -180,10 +180,6 @@ class DefaultSaloServiceTest implements TestFixtures {
                 return infraCreatedSuccessfully;
             }
 
-            @BeforeAll
-            public void beforeAll() {
-            }
-
             @Disabled("TODO: sdlc-helper app is required to complete the step")
             @LargeTest
             @DisplayName("Boot k8s Environment")
@@ -194,26 +190,37 @@ class DefaultSaloServiceTest implements TestFixtures {
 
                 envCreatedSuccessfully = true;
             }
-        }
 
-        @AfterAll
-        public void afterAll() {
-            if (infraCreatedSuccessfully) {
-                defaultSaloService.destroyInfrastructure(salo);
+            @Nested
+            @TestInstance(Lifecycle.PER_CLASS)
+            public class InfraDestructionTest {
 
-                long executionId = waitForExecutionId("destroy infrastructure");
+                @LargeTest
+                @DisplayName("Destroy infrastructure")
+                void destroyInfrastructure() {
+                    defaultSaloService.destroyInfrastructure(salo);
 
-                waitPipelineCompletion(executionId, "destroy infrastructure");
+                    long executionId = waitForExecutionId("destroy infrastructure");
 
-                // only if test successfully destroyed the infrastructure - allow dropping repositories
-                safeToDropRepositories = true;
+                    waitPipelineCompletion(executionId, "destroy infrastructure");
+
+                    // only if test successfully destroyed the infrastructure - allow dropping repositories
+                    infraDestroyed = true;
+                }
+
+                @AfterAll
+                public void afterAll() {
+                    if (infraDestroyed) {
+                        // TODO: remove S3 bucket with tf state
+                    }
+                }
             }
         }
     }
 
     @AfterAll
     public void afterAll() {
-        if (safeToDropRepositories) {
+        if (infraDestroyed) {
             // TODO migrate to GH client
             dropRepository("infra");
             dropRepository("env");

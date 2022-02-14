@@ -31,4 +31,4 @@ jobs:
           AWS_TEST_SECRET: ${{ secrets.AWS_TEST_SECRET }}
         with:
           gradle-executable: gradlew
-          arguments: test --tests "com.vitechteam.sdlc.env.DefaultSaloServiceTest"
+          arguments: largeTest

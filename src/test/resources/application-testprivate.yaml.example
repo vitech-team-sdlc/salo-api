@@ -1,0 +1,14 @@
+# COPY_ME without `.example` extension and replace values in angle brackets
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          client-secret: <GH_TEST_TOKEN>
+
+largeTest:
+  github:
+    testToken: <GH_TEST_TOKEN>
+  aws:
+    clientId: <AWS_TEST_CLIENT_ID>
+    secret: <AWS_TEST_SECRET>

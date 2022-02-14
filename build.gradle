@@ -68,7 +68,16 @@ dependencyManagement {
 
 tasks.named('test') {
   outputs.dir snippetsDir
-  useJUnitPlatform()
+  useJUnitPlatform {
+    includeTags "small", "medium"
+  }
+}
+
+tasks.register('largeTest', Test) {
+  outputs.dir snippetsDir
+  useJUnitPlatform {
+    includeTags "large"
+  }
 }
 
 tasks.named('asciidoctor') {

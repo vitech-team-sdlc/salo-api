@@ -1,12 +1,12 @@
 package com.vitechteam.sdlc;
 
-import com.vitechteam.sdlc.testConfig.SmallTest;
+import com.vitechteam.sdlc.testConfig.MediumTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class SdlcApiApplicationTests {
 
-    @SmallTest
+    @MediumTest
     void testContextLoads() {
     }
 

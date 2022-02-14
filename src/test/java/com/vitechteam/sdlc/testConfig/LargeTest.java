@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Tag("medium")
+@Tag("large")
 @Test
-public @interface MediumTest {
+public @interface LargeTest {
 }

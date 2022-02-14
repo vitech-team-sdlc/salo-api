@@ -1,6 +1,8 @@
 package com.vitechteam.sdlc.env.model.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +16,8 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonPropertyOrder(alphabetic = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class IngressConfig {
 
     boolean externalDNS;
@@ -22,18 +26,20 @@ public class IngressConfig {
     String domain;
     boolean ignoreLoadBalancer;
     String namespaceSubDomain;
-    TLSConfig tLS;
+    TLSConfig tls;
     Map<String, String> annotations;
 
-    public IngressConfig(boolean externalDNS, String domain, TLSConfig tLS) {
+    public IngressConfig(boolean externalDNS, String domain, TLSConfig tls) {
         this.externalDNS = externalDNS;
         this.domain = domain;
-        this.tLS = tLS;
+        this.tls = tls;
     }
 
     @Value
     @Builder
     @Jacksonized
+    @JsonPropertyOrder(alphabetic = true)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class TLSConfig {
         boolean enabled;
         String email;

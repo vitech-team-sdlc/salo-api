@@ -1,5 +1,18 @@
 spring:
   profiles:
     active: dev,private,testprivate
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          introspection-uri: https://api.github.com/user
+          client-id: token
+          client-secret: ${GH_TEST_TOKEN}
 
-ghTestToken: ${GH_TEST_TOKEN}
+largeTest:
+  github:
+    testToken: ${GH_TEST_TOKEN}
+    organization: vitech-team-sdlc
+  aws:
+    clientId: ${AWS_TEST_CLIENT_ID}
+    secret: ${AWS_TEST_SECRET}

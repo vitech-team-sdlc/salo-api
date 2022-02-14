@@ -1,0 +1,9 @@
+# COPY_ME without `.example` extension and replace values in angle brackets
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          introspection-uri: https://api.github.com/user
+          client-id: token
+          client-secret: <GH_TOKEN>

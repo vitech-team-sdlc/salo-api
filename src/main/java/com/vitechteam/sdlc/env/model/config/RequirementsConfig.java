@@ -2,6 +2,7 @@ package com.vitechteam.sdlc.env.model.config;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 
@@ -11,6 +12,7 @@ import java.util.Map;
 
 @Data
 @JsonPropertyOrder(alphabetic = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RequirementsConfig {
 
     Map<String, Object> unknownFields = new HashMap<>();

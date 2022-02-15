@@ -1,0 +1,155 @@
+{
+  "name": "3 environments",
+  "environments": [
+    {
+      "name": "Development",
+      "cluster": {
+        "nodeGroups": [
+          {
+            "name": "pipelines",
+            "maxSize": 2,
+            "minSize": 1,
+            "spotSize": 1,
+            "volumeSize": 60,
+            "vmTypes": [
+              "m5.xlarge",
+              "m5a.xlarge",
+              "m5d.xlarge",
+              "m5ad.xlarge",
+              "m5n.xlarge",
+              "m5.2xlarge",
+              "m5a.2xlarge",
+              "m5d.2xlarge",
+              "m5ad.2xlarge",
+              "m5n.2xlarge"
+            ]
+          },
+          {
+            "name": "main",
+            "maxSize": 2,
+            "minSize": 1,
+            "spotSize": 1,
+            "volumeSize": 60,
+            "vmTypes": [
+              "m5.xlarge",
+              "m5a.xlarge",
+              "m5d.xlarge",
+              "m5ad.xlarge",
+              "m5n.xlarge",
+              "m5.2xlarge",
+              "m5a.2xlarge",
+              "m5d.2xlarge",
+              "m5ad.2xlarge",
+              "m5n.2xlarge"
+            ]
+          }
+        ]
+      },
+      "config": {
+        "key": "dev",
+        "remoteCluster": false,
+        "promotionStrategy": "Auto"
+      }
+    },
+    {
+      "name": "Staging",
+      "cluster": {
+        "nodeGroups": [
+          {
+            "name": "pipelines",
+            "maxSize": 2,
+            "minSize": 1,
+            "spotSize": 1,
+            "volumeSize": 60,
+            "vmTypes": [
+              "m5.xlarge",
+              "m5a.xlarge",
+              "m5d.xlarge",
+              "m5ad.xlarge",
+              "m5n.xlarge",
+              "m5.2xlarge",
+              "m5a.2xlarge",
+              "m5d.2xlarge",
+              "m5ad.2xlarge",
+              "m5n.2xlarge"
+            ]
+          },
+          {
+            "name": "main",
+            "maxSize": 2,
+            "minSize": 1,
+            "spotSize": 1,
+            "volumeSize": 60,
+            "vmTypes": [
+              "m5.xlarge",
+              "m5a.xlarge",
+              "m5d.xlarge",
+              "m5ad.xlarge",
+              "m5n.xlarge",
+              "m5.2xlarge",
+              "m5a.2xlarge",
+              "m5d.2xlarge",
+              "m5ad.2xlarge",
+              "m5n.2xlarge"
+            ]
+          }
+        ]
+      },
+      "config": {
+        "key": "stg",
+        "remoteCluster": false,
+        "promotionStrategy": "Manual"
+      }
+    },
+    {
+      "name": "Production",
+      "cluster": {
+        "nodeGroups": [
+          {
+            "name": "pipelines",
+            "maxSize": 2,
+            "minSize": 1,
+            "spotSize": 1,
+            "volumeSize": 60,
+            "vmTypes": [
+              "m5.xlarge",
+              "m5a.xlarge",
+              "m5d.xlarge",
+              "m5ad.xlarge",
+              "m5n.xlarge",
+              "m5.2xlarge",
+              "m5a.2xlarge",
+              "m5d.2xlarge",
+              "m5ad.2xlarge",
+              "m5n.2xlarge"
+            ]
+          },
+          {
+            "name": "main",
+            "maxSize": 2,
+            "minSize": 1,
+            "spotSize": 1,
+            "volumeSize": 60,
+            "vmTypes": [
+              "m5.xlarge",
+              "m5a.xlarge",
+              "m5d.xlarge",
+              "m5ad.xlarge",
+              "m5n.xlarge",
+              "m5.2xlarge",
+              "m5a.2xlarge",
+              "m5d.2xlarge",
+              "m5ad.2xlarge",
+              "m5n.2xlarge"
+            ]
+          }
+        ]
+      },
+      "config": {
+        "key": "prd",
+        "remoteCluster": false,
+        "promotionStrategy": "Manual"
+      }
+    }
+  ]
+}

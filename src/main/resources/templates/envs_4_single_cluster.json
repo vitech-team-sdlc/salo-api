@@ -22,6 +22,26 @@
               "m5d.2xlarge",
               "m5ad.2xlarge",
               "m5n.2xlarge"
+            ],
+            "labels": [
+              {
+                "key": "pipeline",
+                "value": "true"
+              }
+            ],
+            "taints": [
+              {
+                "key": "pipeline",
+                "value": "true",
+                "effect": "PreferNoSchedule"
+              }
+            ],
+            "tags": [
+              {
+                "key": "pipeline",
+                "value": "true",
+                "propagateAtLaunch": true
+              }
             ]
           },
           {
@@ -72,6 +92,26 @@
               "m5d.2xlarge",
               "m5ad.2xlarge",
               "m5n.2xlarge"
+            ],
+            "labels": [
+              {
+                "key": "pipeline",
+                "value": "true"
+              }
+            ],
+            "taints": [
+              {
+                "key": "pipeline",
+                "value": "true",
+                "effect": "PreferNoSchedule"
+              }
+            ],
+            "tags": [
+              {
+                "key": "pipeline",
+                "value": "true",
+                "propagateAtLaunch": true
+              }
             ]
           },
           {
@@ -122,6 +162,26 @@
               "m5d.2xlarge",
               "m5ad.2xlarge",
               "m5n.2xlarge"
+            ],
+            "labels": [
+              {
+                "key": "pipeline",
+                "value": "true"
+              }
+            ],
+            "taints": [
+              {
+                "key": "pipeline",
+                "value": "true",
+                "effect": "PreferNoSchedule"
+              }
+            ],
+            "tags": [
+              {
+                "key": "pipeline",
+                "value": "true",
+                "propagateAtLaunch": true
+              }
             ]
           },
           {
@@ -172,6 +232,26 @@
               "m5d.2xlarge",
               "m5ad.2xlarge",
               "m5n.2xlarge"
+            ],
+            "labels": [
+              {
+                "key": "pipeline",
+                "value": "true"
+              }
+            ],
+            "taints": [
+              {
+                "key": "pipeline",
+                "value": "true",
+                "effect": "PreferNoSchedule"
+              }
+            ],
+            "tags": [
+              {
+                "key": "pipeline",
+                "value": "true",
+                "propagateAtLaunch": true
+              }
             ]
           },
           {

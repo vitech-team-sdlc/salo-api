@@ -1,4 +1,4 @@
-package com.vitechteam.sdlc.env.model.config;
+package com.vitechteam.sdlc.env.model;
 
 public enum PromotionStrategy {
     Never,

@@ -7,7 +7,7 @@ import com.vitechteam.sdlc.env.model.cluster.Cluster;
 import com.vitechteam.sdlc.env.model.cluster.NodeGroup;
 import com.vitechteam.sdlc.env.model.config.EnvironmentConfig;
 import com.vitechteam.sdlc.env.model.config.IngressConfig;
-import com.vitechteam.sdlc.env.model.config.PromotionStrategy;
+import com.vitechteam.sdlc.env.model.PromotionStrategy;
 
 import java.util.List;
 import java.util.Map;
@@ -47,48 +47,35 @@ public interface TestFixtures {
                 ))
                 .build();
 
-        final var devEnvironment = new Environment(
-                devCluster,
-                new EnvironmentConfig(Environment.DEV_ENV_KEY, PromotionStrategy.Auto)
-        );
+        final var devEnvironment = Environment.builder()
+                .cluster(devCluster)
+                .config(EnvironmentConfig.builder()
+                        .key(Environment.DEV_ENV_KEY)
+                        .promotionStrategy(PromotionStrategy.Auto)
+                        .build())
+                .build();
 //        final var stagingEnvironment = new Environment(new EnvironmentConfig("STG", PromotionStrategy.Auto));
 //        final var prdEnvironment = new Environment(new EnvironmentConfig("PRD", PromotionStrategy.Auto));
 
-        return new Salo(
-                name,
-                CloudProvider.AWS,
-                organization,
-                ingressConfig,
-                List.of(
-                        devEnvironment/*,
-                        stagingEnvironment,
-                        prdEnvironment*/
-                )
-        );
+        return Salo.builder()
+                .name(name)
+                .organization(organization)
+                .cloudProvider(CloudProvider.AWS)
+                .ingressConfig(ingressConfig)
+                .environments(List.of(devEnvironment))
+                .build();
     }
 
     default NodeGroup newNodeGroup(final String name) {
-        return new NodeGroup(
-                name,
-                2,
-                1,
-                1,
-                List.of(), //List.of(new Label("label-key", "label-value")),
-                List.of(), //List.of(new Taint("taint-key", "taint-value", TaintEffect.PreferNoSchedule)),
-                List.of(), //List.of(new Tag("tag-key", "tag-value", true)),
-                60,
-                List.of(
-                        "m5.xlarge"/*,
-                        "m5a.xlarge",
-                        "m5d.xlarge",
-                        "m5ad.xlarge",
-                        "m5n.xlarge",
-                        "m5.2xlarge",
-                        "m5a.2xlarge",
-                        "m5d.2xlarge",
-                        "m5ad.2xlarge",
-                        "m5n.2xlarge"*/
-                )
-        );
+        return NodeGroup.builder()
+                .name(name)
+                .maxSize(2)
+                .minSize(1)
+                .spotSize(1)
+                .volumeSize(60)
+                .vmTypes(List.of(
+                        "m5.xlarge"
+                ))
+                .build();
     }
 }

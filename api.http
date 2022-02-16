@@ -44,10 +44,10 @@ Authorization: Bearer {{gh-token}}
 
 {
   "name": "{{name}}",
-  "cloudProvider": "AWS",
   "organization": "{{organization}}",
-  "ingressConfig": {
-    "domain": "sdlcvitech.com",
+  "cloudProvider": "AWS",
+  "domain": {
+    "name": "sdlcvitech.com",
     "tls": {
       "email": "{{email}}"
     }
@@ -56,11 +56,10 @@ Authorization: Bearer {{gh-token}}
     {
       "cluster": {
         "name": "{{name}}-cluster",
-        "jxBotUsername": "{{gh-username}}",
         "cloudProviderClientId": "{{aws-client-id}}",
         "cloudProviderSecret": "{{aws-secret}}",
-        "domainOwner": true,
         "region": "us-east-2",
+        "domainOwner": true,
         "nodeGroups": [
           {
             "name": "pipelines",
@@ -107,3 +106,11 @@ Authorization: Bearer {{gh-token}}
 POST {{hostname}}/salo/{{organization}}/{{name}}/destroy
 Content-Type: application/json
 Authorization: Bearer {{gh-token}}
+
+### Calculate cost on Sa10 template
+POST {{hostname}}/cost/template
+Content-Type: application/json
+Authorization: Bearer {{gh-token}}
+
+< ./src/main/resources/templates/envs_3_single_cluster.json
+#< ./src/main/resources/templates/envs_4_single_cluster.json

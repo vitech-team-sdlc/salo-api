@@ -6,41 +6,35 @@ import com.vitechteam.sdlc.env.model.config.EnvironmentConfig;
 import com.vitechteam.sdlc.scm.PipelineStatus;
 import com.vitechteam.sdlc.scm.Repository;
 import lombok.Builder;
+import lombok.Value;
+import lombok.With;
 
 import java.util.List;
 
-@Builder
-public record Environment(
-        Cluster cluster,
-        EnvironmentConfig config,
-        Status status
-) {
-
+@Value
+@Builder(toBuilder = true)
+public class Environment {
     public static final String DEV_ENV_KEY = "dev";
 
-    public Environment(Cluster cluster, EnvironmentConfig config) {
-        this(cluster, config, null);
-    }
-
-    public Environment(EnvironmentConfig config) {
-        this(null, config, null);
-    }
+    @With Cluster cluster;
+    @With EnvironmentConfig config;
+    @With Status status;
 
     public boolean needsEnvironmentRepoCreation() {
-        return isDev() || config.remoteCluster();
+        return isDev() || config.isRemoteCluster();
     }
 
     @JsonIgnore
     public boolean isDev() {
-        return DEV_ENV_KEY.equals(config.key());
+        return DEV_ENV_KEY.equals(config.getKey());
     }
 
     public Repository envRepository() {
         return new Repository(
-                config.repository(),
-                config.owner(),
+                config.getRepository(),
+                config.getOwner(),
                 Repository.DEFAULT_BRANCH,
-                config.gitUrl()
+                config.getGitUrl()
         );
     }
 
@@ -48,9 +42,15 @@ public record Environment(
         return List.of(environments);
     }
 
-    public record Status(
-            PipelineStatus infraPipelineStatus
-    ) {
+    @Value
+    @Builder
+    public static class Status {
+        PipelineStatus infraPipelineStatus;
 
+        public static Status of(PipelineStatus pipelineStatus) {
+            return Environment.Status.builder()
+                    .infraPipelineStatus(pipelineStatus)
+                    .build();
+        }
     }
 }

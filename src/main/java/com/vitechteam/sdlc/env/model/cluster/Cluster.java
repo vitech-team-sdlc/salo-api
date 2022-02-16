@@ -25,7 +25,8 @@ public class Cluster {
     boolean domainOwner;
     String cloudProfile;
     String region;
-    Collection<NodeGroup> nodeGroups;
+    @Builder.Default
+    Collection<NodeGroup> nodeGroups = List.of();
     @With
     Repository repository;
 

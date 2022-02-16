@@ -1,35 +1,31 @@
 package com.vitechteam.sdlc.env.model.cluster;
 
-import javax.annotation.Nonnegative;
+import lombok.Builder;
+import lombok.Value;
+
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 import java.util.List;
 
-public record NodeGroup(
-        String name,
-        @Nonnegative
-        int maxSize,
-        @Nonnegative
-        int minSize,
-        @Nonnegative
-        int spotSize,
-        Collection<Label> labels,
-        Collection<Taint> taints,
-        Collection<Tag> tags,
-        @Nonnegative
-        int volumeSize,
-        Collection<String> vmTypes
-) {
-    public NodeGroup(String name, int maxSize, int minSize, int spotSize, int volumeSize, List<String> vmTypes) {
-        this(
-                name,
-                maxSize,
-                minSize,
-                spotSize,
-                null,
-                null,
-                null,
-                volumeSize,
-                vmTypes
-        );
-    }
+@Value
+@Builder
+public class NodeGroup {
+    String name;
+    @Positive
+    int maxSize;
+    @Positive
+    int minSize;
+    @PositiveOrZero
+    int spotSize;
+    @Builder.Default
+    Collection<Label> labels = List.of();
+    @Builder.Default
+    Collection<Taint> taints = List.of();
+    @Builder.Default
+    Collection<Tag> tags = List.of();
+    @Positive
+    int volumeSize;
+    @Builder.Default
+    Collection<String> vmTypes = List.of();
 }

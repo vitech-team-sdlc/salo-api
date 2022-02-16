@@ -15,12 +15,12 @@ public record SaloTemplate(
 ) {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record EnvironmentTemplate(
-            String name,
             ClusterTemplate cluster,
             ConfigTemplate config
     ) {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         public record ClusterTemplate(
+                String name,
                 Collection<NodeGroupTemplate> nodeGroups
         ) {
             @JsonInclude(JsonInclude.Include.NON_NULL)

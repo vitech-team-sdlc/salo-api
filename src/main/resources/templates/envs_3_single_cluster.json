@@ -2,8 +2,8 @@
   "name": "3 environments",
   "environments": [
     {
-      "name": "Development",
       "cluster": {
+        "name": "Development",
         "nodeGroups": [
           {
             "name": "pipelines",
@@ -72,8 +72,8 @@
       }
     },
     {
-      "name": "Staging",
       "cluster": {
+        "name": "Staging",
         "nodeGroups": [
           {
             "name": "pipelines",
@@ -142,8 +142,8 @@
       }
     },
     {
-      "name": "Production",
       "cluster": {
+        "name": "Production",
         "nodeGroups": [
           {
             "name": "pipelines",

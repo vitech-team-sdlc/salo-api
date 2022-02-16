@@ -32,8 +32,8 @@ GET {{hostname}}/salo/{{organization}}/{{name}}/status
 Content-Type: application/json
 Authorization: Bearer {{gh-token}}
 
-### Get List of Sa10 templates
-GET {{hostname}}/salo/{{organization}}/templates
+### Get List of predefined templates
+GET {{hostname}}/templates
 Content-Type: application/json
 Authorization: Bearer {{gh-token}}
 

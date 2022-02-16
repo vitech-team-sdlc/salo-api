@@ -103,8 +103,8 @@ public class TfVars {
     }
 
     public void mergeWith(Environment environment, IngressConfig ingressConfig) {
-        final Cluster cluster = environment.cluster();
-        this.clusterName = String.format("%s-%s", cluster.getName(), environment.config().key());
+        final Cluster cluster = environment.getCluster();
+        this.clusterName = String.format("%s-%s", cluster.getName(), environment.getConfig().getKey());
         this.apexDomain = ingressConfig.getDomain();
         this.subdomain = cluster.getName();
         this.domainRegisteredInSameAwsAccount = cluster.isDomainOwner();
@@ -117,19 +117,19 @@ public class TfVars {
 
         this.workers.clear();
 
-        cluster.getNodeGroups().forEach(node -> this.workers.put(node.name(), new Worker(
+        cluster.getNodeGroups().forEach(node -> this.workers.put(node.getName(), new Worker(
                 new HashMap<>(),
-                node.minSize(),
-                node.maxSize(),
-                node.minSize(),
-                node.labels(),
-                node.taints(),
-                node.maxSize() - node.spotSize(),
-                node.vmTypes(),
+                node.getMinSize(),
+                node.getMaxSize(),
+                node.getMinSize(),
+                node.getLabels(),
+                node.getTaints(),
+                node.getMaxSize() - node.getSpotSize(),
+                node.getVmTypes(),
                 "0.04",
-                node.volumeSize(),
+                node.getVolumeSize(),
                 true,
-                node.tags()
+                node.getTags()
         )));
     }
 

@@ -243,14 +243,14 @@ public class GitHubScm implements Scm {
     }
 
     private PipelineStatus toPipelineStatus(GHWorkflowRun ghRun) {
-        return new PipelineStatus(
-                ghRun.getId(),
-                ghRun.getStatus().name(),
-                Optional.ofNullable(ghRun.getConclusion())
+        return PipelineStatus.builder()
+                .id(ghRun.getId())
+                .status(ghRun.getStatus().name())
+                .conclusion(Optional.ofNullable(ghRun.getConclusion())
                         .map(GHWorkflowRun.Conclusion::name)
-                        .orElse(null),
-                ghRun.getLogsUrl().toString(),
-                ghRun.getHeadSha()
-        );
+                        .orElse(null))
+                .logsUrl(ghRun.getLogsUrl().toString())
+                .commit(ghRun.getHeadSha())
+                .build();
     }
 }

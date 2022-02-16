@@ -31,28 +31,23 @@ public class DefaultSaloService implements SaloService {
     public Salo save(Salo newSalo) {
 
         final List<Environment> environments = newSalo
-                .environments()
+                .getEnvironments()
                 .stream()
                 .filter(Environment::needsEnvironmentRepoCreation)
                 .map(envToCreate -> {
-                    log.info("Processing next environment {} for {}", envToCreate.config().key(), newSalo.name());
+                    log.info("Processing next environment {} for {}", envToCreate.getConfig().getKey(), newSalo.getName());
                     Environment env = createEnvironmentRepo(newSalo, envToCreate);
-                    env = createInfraRepo(newSalo, env, newSalo.ingressConfig());
-                    createSecrets(env, env.cluster().getRepository());
+                    env = createInfraRepo(newSalo, env, newSalo.getIngressConfig());
+                    createSecrets(env, env.getCluster().getRepository());
                     return env;
                 })
                 .toList();
 
+        final Salo salo = newSalo.toBuilder()
+                .environments(environments)
+                .build();
 
-        final Salo salo = configureDevEnvironment(new Salo(
-                newSalo.name(),
-                newSalo.cloudProvider(),
-                newSalo.organization(),
-                newSalo.ingressConfig(),
-                environments
-        ));
-
-        return salo;
+        return configureDevEnvironment(salo);
     }
 
     @Override
@@ -67,10 +62,10 @@ public class DefaultSaloService implements SaloService {
 
     private void triggerInfraPipeline(Salo salo, boolean doApply, boolean doDestroy) {
         salo
-                .environments()
+                .getEnvironments()
                 .stream()
                 .filter(Environment::needsEnvironmentRepoCreation)
-                .map(Environment::cluster)
+                .map(Environment::getCluster)
                 .forEach(cluster -> this.scm.triggerInfrastructureUpdate(
                         cluster.getRepository(),
                         new UpdateInfrastructureParams(cluster.getRegion(), doApply, doDestroy)
@@ -83,67 +78,61 @@ public class DefaultSaloService implements SaloService {
         final JxRequirements jxRequirements = this.scm.getJxRequirements(devEnvironment.envRepository());
 
         jxRequirements.spec().getIngress().setDomain(
-                String.format("%s.%s", salo.name(), salo.ingressConfig().getDomain())
+                String.format("%s.%s", salo.getName(), salo.getIngressConfig().getDomain())
         );
-        jxRequirements.spec().setEnvironments(salo.environments().stream().map(Environment::config).toList());
+        jxRequirements.spec().setEnvironments(salo.getEnvironments().stream().map(Environment::getConfig).toList());
 
         this.scm.updateJxRequirements(jxRequirements, devEnvironment.envRepository());
         return salo;
     }
 
     private void createSecrets(Environment environment, Repository repository) {
-        this.scm.createSecret("AWS_ACCESS_KEY_ID", environment.cluster().getCloudProviderClientId(), repository);
-        this.scm.createSecret("AWS_SECRET_ACCESS_KEY", environment.cluster().getCloudProviderSecret(), repository);
+        this.scm.createSecret("AWS_ACCESS_KEY_ID", environment.getCluster().getCloudProviderClientId(), repository);
+        this.scm.createSecret("AWS_SECRET_ACCESS_KEY", environment.getCluster().getCloudProviderSecret(), repository);
         this.scm.createSecret("ACCESS_TOKEN", scm.generateAccessToken(), repository);
     }
 
     private Environment createEnvironmentRepo(Salo salo, Environment environment) {
-        final Repository template = environment.config().remoteCluster() ? Scm.REMOTE_ENV_REPO_TEMPLATE : Scm.ENV_REPO_TEMPLATE;
+        final EnvironmentConfig config = environment.getConfig();
+        final Repository template = config.isRemoteCluster() ? Scm.REMOTE_ENV_REPO_TEMPLATE : Scm.ENV_REPO_TEMPLATE;
         final Repository repository = this.scm.create(new Repository(
-                        String.format("env-%s-%s", salo.name(), environment.config().key()),
-                        salo.organization()
+                        String.format("env-%s-%s", salo.getName(), config.getKey()),
+                        salo.getOrganization()
                 ),
                 template
         );
-        final Environment environment1 = new Environment(
-                environment.cluster(),
-                new EnvironmentConfig(
-                        environment.config().key(),
-                        salo.organization(),
-                        repository.name(),
-                        environment.config().gitServer(),
-                        environment.config().gitKind(),
-                        repository.url(),
-                        environment.config().remoteCluster(),
-                        environment.config().promotionStrategy(),
-                        environment.config().namespace()
-                )
-        );
+
         log.info("new environment repo created {} using template {}", repository.fullName(), template);
-        return environment1;
+        return environment.withConfig(
+                config.toBuilder()
+                        .owner(salo.getOrganization())
+                        .repository(repository.name())
+                        .gitUrl(repository.url())
+                        .build()
+        );
     }
 
     private Environment createInfraRepo(Salo salo, Environment environment, IngressConfig ingress) {
         final Repository repository = this.scm.create(new Repository(
-                        String.format("infra-%s-%s", salo.name(), environment.config().key()),
-                        environment.config().owner()
+                        String.format("infra-%s-%s", salo.getName(), environment.getConfig().getKey()),
+                        environment.getConfig().getOwner()
                 ),
                 Scm.INFRA_TEMPLATE
         );
         log.info("new infra repo created {} using template {}", repository.fullName(), Scm.INFRA_TEMPLATE);
 
         final Cluster newCluster = environment
-                .cluster()
-                .withName(salo.name())
+                .getCluster()
+                .withName(salo.getName())
                 .withJxBotUsername(scm.currentUser().id())
                 .withRepository(repository);
-        final Environment newEnvironment = new Environment(newCluster, environment.config());
+        final Environment newEnvironment = environment.withCluster(newCluster);
 
         final TfVars tfVars = this.scm.getTfVars(repository);
         tfVars.mergeWith(newEnvironment, ingress);
         this.scm.updateTfVars(tfVars, repository);
 
-        log.info("new tf vars generated for {} salo: {}", repository.fullName(), salo.name());
+        log.info("new tf vars generated for {} salo: {}", repository.fullName(), salo.getName());
 
         return newEnvironment;
     }
@@ -160,22 +149,25 @@ public class DefaultSaloService implements SaloService {
                             .spec()
                             .getEnvironments()
                             .stream()
-                            .filter(ec -> ec.remoteCluster() || ec.isDev())
+                            .filter(ec -> ec.isRemoteCluster() || ec.isDev())
                             .map(jxEnv -> {
                                 final Cluster cluster = findCluster(saloName, jxEnv, repositories);
-                                return new Environment(cluster, jxEnv);
+                                return Environment.builder()
+                                        .cluster(cluster)
+                                        .config(jxEnv)
+                                        .build();
                             })
                             .toList();
                     if (environments.isEmpty()) {
                         throw new IllegalStateException("incorrect env configuration, envs can't be empty");
                     }
-                    return new Salo(
-                            saloName,
-                            CloudProvider.AWS,
-                            organization,
-                            jxRequirements.spec().getIngress(),
-                            environments
-                    );
+                    return Salo.builder()
+                            .name(saloName)
+                            .organization(organization)
+                            .cloudProvider(CloudProvider.AWS)
+                            .ingressConfig(jxRequirements.spec().getIngress())
+                            .environments(environments)
+                            .build();
                 })
                 .toList();
     }
@@ -184,7 +176,7 @@ public class DefaultSaloService implements SaloService {
     public Optional<Salo> findByNameAndOrg(String saloName, String organization) {
         return this.findByOrganization(organization)
                 .stream()
-                .filter(s -> s.name().equals(saloName))
+                .filter(s -> s.getName().equals(saloName))
                 .findFirst();
     }
 
@@ -192,26 +184,22 @@ public class DefaultSaloService implements SaloService {
     public Optional<Salo> findStatusByNameAndOrg(String name, String organization) {
         return this.findByNameAndOrg(name, organization)
                 .map(salo -> {
-                    final List<Environment> environments = salo.environments().stream()
+                    final List<Environment> environments = salo.getEnvironments().stream()
                             .filter(Environment::needsEnvironmentRepoCreation)
-                            .map(env -> this.scm.findLatestInfraPipelineStatus(env.cluster().getRepository())
-                                    .map(st -> new Environment(env.cluster(), env.config(), new Environment.Status(st)))
-                                    .orElse(env)
-                            )
+                            .map(env -> this.scm.findLatestInfraPipelineStatus(env.getCluster().getRepository())
+                                    .map(Environment.Status::of)
+                                    .map(env::withStatus)
+                                    .orElse(env))
                             .toList();
-                    return new Salo(
-                            salo.name(),
-                            salo.cloudProvider(),
-                            salo.organization(),
-                            salo.ingressConfig(),
-                            environments
-                    );
+                    return salo.toBuilder()
+                            .environments(environments)
+                            .build();
                 });
     }
 
     @Nonnull
     private Cluster findCluster(String saloName, EnvironmentConfig environmentConfig, Collection<Repository> repositories) {
-        final String lookingForName = String.format("infra-%s-%s", saloName, environmentConfig.key());
+        final String lookingForName = String.format("infra-%s-%s", saloName, environmentConfig.getKey());
         final Repository infraRepo = repositories
                 .stream()
                 .filter(r -> r.name().equals(lookingForName))
@@ -222,17 +210,19 @@ public class DefaultSaloService implements SaloService {
 
         final TfVars tfVars = this.scm.getTfVars(infraRepo);
         final List<NodeGroup> nodeGroups = new ArrayList<>();
-        tfVars.getWorkers().forEach((name, worker) -> nodeGroups.add(new NodeGroup(
-                name,
-                worker.getAsgMaxSize(),
-                worker.getAsgMinSize(),
-                worker.getAsgMaxSize() - worker.getOnDemandBaseCapacity(),
-                worker.getK8SLabels(),
-                worker.getK8STaints(),
-                worker.getTags(),
-                worker.getRootVolumeSize(),
-                worker.getOverrideInstanceTypes()
-        )));
+        tfVars.getWorkers().forEach((name, worker) -> nodeGroups.add(
+                NodeGroup.builder()
+                        .name(name)
+                        .maxSize(worker.getAsgMaxSize())
+                        .minSize(worker.getAsgMinSize())
+                        .spotSize(worker.getAsgMaxSize() - worker.getOnDemandBaseCapacity())
+                        .labels(worker.getK8SLabels())
+                        .taints(worker.getK8STaints())
+                        .tags(worker.getTags())
+                        .volumeSize(worker.getRootVolumeSize())
+                        .vmTypes(worker.getOverrideInstanceTypes())
+                        .build()
+        ));
 
         return Cluster.builder()
                 .name(tfVars.getClusterName())

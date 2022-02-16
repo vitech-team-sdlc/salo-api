@@ -77,7 +77,7 @@ class DefaultSaloServiceTest implements TestFixtures {
         final Salo savedSalo = defaultSaloService.save(saloTemplate);
 
         // validate just created instance
-        final Optional<Salo> foundSalo = defaultSaloService.findByNameAndOrg(savedSalo.name(), ghOrganization);
+        final Optional<Salo> foundSalo = defaultSaloService.findByNameAndOrg(savedSalo.getName(), ghOrganization);
         assertThat(foundSalo)
                 .as("expected to find salo with name [%s]", name)
                 .isPresent();
@@ -104,7 +104,7 @@ class DefaultSaloServiceTest implements TestFixtures {
 
         @BeforeAll
         public void beforeAll() {
-            infraRepository = salo.findDevEnvironment().cluster().getRepository();
+            infraRepository = salo.findDevEnvironment().getCluster().getRepository();
         }
 
         @LargeTest
@@ -122,23 +122,23 @@ class DefaultSaloServiceTest implements TestFixtures {
         }
 
         private long waitForExecutionId(String label) {
-            // wait until pipeline starts
-            waitAtMost(1, TimeUnit.MINUTES)
+            // wait until AWS environment gets rolled up and GIT infra repository updated
+            final Optional<PipelineStatus> pipelineStatus = waitAtMost(1, TimeUnit.MINUTES)
                     .alias("waiting until [%s] pipeline starts".formatted(label))
                     .pollInterval(1, TimeUnit.SECONDS)
                     .await()
-                    .until(() -> gitHubScm
-                            .findLatestInfraPipelineStatus(infraRepository)
-                            .filter(status -> Set.of("QUEUED", "IN_PROGRESS").contains(status.status()))
-                            .isPresent());
+                    .until(
+                            () -> gitHubScm
+                                    .findLatestInfraPipelineStatus(infraRepository)
+                                    .filter(status -> Set.of("QUEUED", "IN_PROGRESS").contains(status.getStatus())),
+                            Optional::isPresent
+                    );
 
-            // wait until AWS environment gets rolled up and GIT infra repository updated
-            final Optional<PipelineStatus> pipelineStatus = gitHubScm.findLatestInfraPipelineStatus(infraRepository);
             assertThat(pipelineStatus)
                     .as("infra pipeline should be triggered in [%s] repo", infraRepository.fullName())
                     .isPresent();
 
-            return pipelineStatus.get().id();
+            return pipelineStatus.get().getId();
         }
 
         private void waitPipelineCompletion(long executionId, String label) {
@@ -152,12 +152,12 @@ class DefaultSaloServiceTest implements TestFixtures {
         private Boolean isPipelineSuccessfullyCompleted(long executionId) {
             final PipelineStatus status = gitHubScm.getPipelineExecutionStatus(infraRepository, executionId);
 
-            switch (status.status()) {
+            switch (status.getStatus()) {
                 case "QUEUED", "IN_PROGRESS" -> {
                     return false;
                 }
                 case "COMPLETED" -> {
-                    assertThat(status.conclusion())
+                    assertThat(status.getConclusion())
                             .as("pipeline execution conclusion is not successful")
                             .isEqualTo("SUCCESS");
                     return true;

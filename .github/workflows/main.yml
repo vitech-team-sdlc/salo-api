@@ -1,4 +1,4 @@
-name: Run Large Test
+name: CI
 
 on:
   push:
@@ -23,7 +23,19 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Run Large Test
+      - name: Assemble
+        uses: gradle/gradle-build-action@v2.1.3
+        with:
+          gradle-executable: gradlew
+          arguments: assemble
+
+      - name: Run Small and Medium Tests
+        uses: gradle/gradle-build-action@v2.1.3
+        with:
+          gradle-executable: gradlew
+          arguments: test
+
+      - name: Run Large Tests
         uses: gradle/gradle-build-action@v2.1.3
         env:
           GH_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}

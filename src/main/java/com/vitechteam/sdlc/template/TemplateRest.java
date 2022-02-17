@@ -13,12 +13,12 @@ import java.util.Collection;
 @AllArgsConstructor
 @Log4j2
 @RestController
-@RequestMapping("templates")
+@RequestMapping(value = "templates", produces = MediaType.APPLICATION_JSON_VALUE)
 class TemplateRest {
 
     private final Templates templates;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     Collection<SaloTemplate> defaults() {
         return this.templates.defaults();
     }

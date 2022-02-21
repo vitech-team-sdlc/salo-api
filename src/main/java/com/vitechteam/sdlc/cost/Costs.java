@@ -89,8 +89,6 @@ public class Costs {
     }
 
     private Optional<BigDecimal> findMaxHourlyPrice(GetProductsIterable products) {
-        products.stream().flatMap(r -> r.priceList().stream()).forEach(log::info);
-
         return products.stream()
                 .filter(GetProductsResponse::hasPriceList)
                 .map(GetProductsResponse::priceList)

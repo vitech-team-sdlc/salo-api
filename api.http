@@ -109,7 +109,7 @@ Content-Type: application/json
 Authorization: Bearer {{gh-token}}
 
 ### Calculate cost on Sa10 template
-POST {{hostname}}/cost/template
+POST {{hostname}}/cost
 Content-Type: application/json
 Authorization: Bearer {{gh-token}}
 

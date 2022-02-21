@@ -16,7 +16,7 @@ public class CostRest {
 
     private final Costs costs;
 
-    @PostMapping("template")
+    @PostMapping
     public CostView estimateForTemplate(
             @RequestBody SaloTemplate saloTemplate
     ) {

@@ -51,11 +51,17 @@ public class Costs {
         )).orElseThrow();
         final BigDecimal ec2Price = findPricing(Product.AmazonEC2, Map.of(
                 "regionCode", "us-east-2",
+                "productFamily", "Compute Instance",
                 "instanceType", "m5.xlarge",
                 "operation", "RunInstances",
                 "tenancy", "Shared",
                 "capacitystatus", "UnusedCapacityReservation"
         )).orElseThrow();
+// TODO:
+//        final BigDecimal ebsPrice = findPricing(Product.AmazonEC2, Map.of(
+//                "regionCode", "us-east-2",
+//                "productFamily", "Storage"
+//        )).orElseThrow();
 
         final long numberOfEksClusters = saloTemplate.environments().stream()
                 .filter(et -> Environment.DEV_ENV_KEY.equals(et.config().key()) || et.config().remoteCluster())

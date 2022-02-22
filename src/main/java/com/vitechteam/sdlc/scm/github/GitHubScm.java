@@ -8,17 +8,19 @@ import com.vitechteam.sdlc.env.model.tf.TfVars;
 import com.vitechteam.sdlc.scm.File;
 import com.vitechteam.sdlc.scm.Organization;
 import com.vitechteam.sdlc.scm.PipelineStatus;
-import com.vitechteam.sdlc.scm.ScmProvider;
 import com.vitechteam.sdlc.scm.Repository;
 import com.vitechteam.sdlc.scm.Scm;
+import com.vitechteam.sdlc.scm.ScmProvider;
 import com.vitechteam.sdlc.scm.Secret;
 import com.vitechteam.sdlc.scm.UpdateInfrastructureParams;
 import com.vitechteam.sdlc.scm.User;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHContentUpdateResponse;
+import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHOrganization;
 import org.kohsuke.github.GHRepository;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Log4j2
 @AllArgsConstructor
 public class GitHubScm implements Scm {
 
@@ -128,11 +131,10 @@ public class GitHubScm implements Scm {
         return customGithubClient.getAccessToken();
     }
 
-    @SneakyThrows
     @Override
-    public JxRequirements getJxRequirements(Repository envRepository) {
-        final File file = findFile(new File(JX_REQ_FILE_PATH), envRepository);
-        return yamlMapper.readValue(file.content(), JxRequirements.class);
+    public Optional<JxRequirements> findJxRequirements(Repository envRepository) {
+        return findFile(new File(JX_REQ_FILE_PATH), envRepository)
+                .map(this::toJxRequirements);
     }
 
     @SneakyThrows
@@ -150,14 +152,14 @@ public class GitHubScm implements Scm {
                 envRepository,
                 "chore: update jx-requirements"
         );
-        return yamlMapper.readValue(file.content(), JxRequirements.class);
+        return toJxRequirements(file);
     }
 
-    @SneakyThrows
     @Override
     public TfVars getTfVars(Repository repository) {
-        final File fileContent = findFile(new File(SALO_TF_VARS_FILE_PATH), repository);
-        return jsonMapper.readValue(fileContent.content(), TfVars.class);
+        return findFile(new File(SALO_TF_VARS_FILE_PATH), repository)
+                .map(this::toTfVars)
+                .orElse(null);
     }
 
     @SneakyThrows
@@ -170,9 +172,20 @@ public class GitHubScm implements Scm {
 
     @SneakyThrows
     @Override
-    public File findFile(File file, Repository repository) {
-        final GHContent fileContent = this.gitHub.getRepository(repository.fullName()).getFileContent(file.path(), repository.branch());
-        return new File(IOUtils.toString(fileContent.read(), DEFAULT_CHARSET), fileContent.getSha(), file.path());
+    public Optional<File> findFile(File file, Repository repository) {
+        try {
+            final GHContent fileContent = this.gitHub
+                    .getRepository(repository.fullName())
+                    .getFileContent(file.path(), repository.branch());
+            return Optional.of(new File(
+                    IOUtils.toString(fileContent.read(), DEFAULT_CHARSET),
+                    fileContent.getSha(),
+                    file.path()
+            ));
+        } catch (GHFileNotFoundException e) {
+            log.debug("File [{}] does not exist in repository [{}]", file, repository);
+        }
+        return Optional.empty();
     }
 
     @SneakyThrows
@@ -252,5 +265,15 @@ public class GitHubScm implements Scm {
                 ghRun.getLogsUrl().toString(),
                 ghRun.getHeadSha()
         );
+    }
+
+    @SneakyThrows
+    private JxRequirements toJxRequirements(File file) {
+        return yamlMapper.readValue(file.content(), JxRequirements.class);
+    }
+
+    @SneakyThrows
+    private TfVars toTfVars(File file) {
+        return jsonMapper.readValue(file.content(), TfVars.class);
     }
 }

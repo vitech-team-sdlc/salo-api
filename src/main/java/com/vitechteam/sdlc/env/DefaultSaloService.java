@@ -3,12 +3,14 @@ package com.vitechteam.sdlc.env;
 import com.vitechteam.sdlc.env.model.CloudProvider;
 import com.vitechteam.sdlc.env.model.Environment;
 import com.vitechteam.sdlc.env.model.Salo;
+import com.vitechteam.sdlc.env.model.SaloStatus;
 import com.vitechteam.sdlc.env.model.cluster.Cluster;
 import com.vitechteam.sdlc.env.model.cluster.NodeGroup;
 import com.vitechteam.sdlc.env.model.config.EnvironmentConfig;
 import com.vitechteam.sdlc.env.model.config.IngressConfig;
 import com.vitechteam.sdlc.env.model.config.JxRequirements;
 import com.vitechteam.sdlc.env.model.tf.TfVars;
+import com.vitechteam.sdlc.scm.PipelineStatus;
 import com.vitechteam.sdlc.scm.Repository;
 import com.vitechteam.sdlc.scm.Scm;
 import com.vitechteam.sdlc.scm.UpdateInfrastructureParams;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @AllArgsConstructor
 @Log4j2
@@ -80,7 +83,7 @@ public class DefaultSaloService implements SaloService {
     @Nonnull
     private Salo configureDevEnvironment(@Nonnull Salo salo) {
         final Environment devEnvironment = salo.findDevEnvironment();
-        final JxRequirements jxRequirements = this.scm.getJxRequirements(devEnvironment.envRepository());
+        final JxRequirements jxRequirements = this.scm.findJxRequirements(devEnvironment.envRepository()).orElseThrow();
 
         jxRequirements.spec().getIngress().setDomain(
                 String.format("%s.%s", salo.name(), salo.ingressConfig().getDomain())
@@ -152,31 +155,34 @@ public class DefaultSaloService implements SaloService {
     public Collection<Salo> findByOrganization(String organization) {
         final Collection<Repository> repositories = this.scm.findRepositoriesByOrg(organization);
         return repositories.stream()
-                .filter(this::isDev)
-                .map(envRepo -> {
-                    final JxRequirements jxRequirements = this.scm.getJxRequirements(envRepo);
-                    final String saloName = envRepo.saloName();
-                    final List<Environment> environments = jxRequirements
-                            .spec()
-                            .getEnvironments()
-                            .stream()
-                            .filter(ec -> ec.remoteCluster() || ec.isDev())
-                            .map(jxEnv -> {
-                                final Cluster cluster = findCluster(saloName, jxEnv, repositories);
-                                return new Environment(cluster, jxEnv);
-                            })
-                            .toList();
-                    if (environments.isEmpty()) {
-                        throw new IllegalStateException("incorrect env configuration, envs can't be empty");
-                    }
-                    return new Salo(
-                            saloName,
-                            CloudProvider.AWS,
-                            organization,
-                            jxRequirements.spec().getIngress(),
-                            environments
-                    );
-                })
+                // TODO: temporary - to be re-written with changes with installation look-up logic
+                .filter(Repository::isSaloInstallation)
+                .filter(Repository::isDev)
+                .flatMap(envRepo -> this.scm.findJxRequirements(envRepo)
+                        .map(jxRequirements -> {
+                            final String saloName = envRepo.saloName();
+                            final List<Environment> environments = jxRequirements
+                                    .spec()
+                                    .getEnvironments()
+                                    .stream()
+                                    .filter(ec -> ec.remoteCluster() || ec.isDev())
+                                    .map(jxEnv -> {
+                                        final Cluster cluster = findCluster(saloName, jxEnv, repositories);
+                                        return new Environment(cluster, jxEnv);
+                                    })
+                                    .toList();
+                            if (environments.isEmpty()) {
+                                throw new IllegalStateException("incorrect env configuration, envs can't be empty");
+                            }
+                            return new Salo(
+                                    saloName,
+                                    CloudProvider.AWS,
+                                    organization,
+                                    jxRequirements.spec().getIngress(),
+                                    environments
+                            );
+                        })
+                        .stream())
                 .toList();
     }
 
@@ -189,21 +195,28 @@ public class DefaultSaloService implements SaloService {
     }
 
     @Override
-    public Optional<Salo> findStatusByNameAndOrg(String name, String organization) {
+    public Optional<SaloStatus> findStatusByNameAndOrg(String name, String organization) {
         return this.findByNameAndOrg(name, organization)
                 .map(salo -> {
-                    final List<Environment> environments = salo.environments().stream()
+                    final List<SaloStatus.Environment> environments = salo.environments().stream()
                             .filter(Environment::needsEnvironmentRepoCreation)
-                            .map(env -> this.scm.findLatestInfraPipelineStatus(env.cluster().getRepository())
-                                    .map(st -> new Environment(env.cluster(), env.config(), new Environment.Status(st)))
-                                    .orElse(env)
-                            )
+                            .map(env -> {
+                                final Optional<PipelineStatus> infraPipelineStatus = this.scm
+                                        .findLatestInfraPipelineStatus(env.cluster().getRepository());
+
+                                return SaloStatus.Environment.of(env, infraPipelineStatus.orElse(null));
+                            })
                             .toList();
-                    return new Salo(
+                    return new SaloStatus(
                             salo.name(),
-                            salo.cloudProvider(),
                             salo.organization(),
-                            salo.ingressConfig(),
+                            environments.stream()
+                                    .flatMap(env -> Stream.of(
+                                            env.environment().status(),
+                                            env.infrastructure().status()
+                                    ))
+                                    .max(SaloStatus.Status::compareTo)
+                                    .orElse(SaloStatus.Status.Unknown),
                             environments
                     );
                 });
@@ -241,10 +254,6 @@ public class DefaultSaloService implements SaloService {
                 .nodeGroups(nodeGroups)
                 .repository(infraRepo)
                 .build();
-    }
-
-    private boolean isDev(Repository repo) {
-        return repo.name().startsWith("env-") && repo.name().endsWith(Environment.DEV_ENV_KEY);
     }
 
     private static class InfraRepositoryNotFound extends RuntimeException {

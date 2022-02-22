@@ -47,7 +47,7 @@ public interface Scm {
 
     String generateAccessToken();
 
-    JxRequirements getJxRequirements(Repository envRepository);
+    Optional<JxRequirements> findJxRequirements(Repository envRepository);
 
     JxRequirements updateJxRequirements(JxRequirements requirementsConfig, Repository envRepository);
 
@@ -55,7 +55,7 @@ public interface Scm {
 
     void updateTfVars(TfVars tfVars, Repository repository);
 
-    File findFile(File file, Repository repository);
+    Optional<File> findFile(File file, Repository repository);
 
     File updateFile(File file, Repository repository, String commitMessage);
 

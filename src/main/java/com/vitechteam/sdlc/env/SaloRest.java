@@ -1,6 +1,7 @@
 package com.vitechteam.sdlc.env;
 
 import com.vitechteam.sdlc.env.model.Salo;
+import com.vitechteam.sdlc.env.model.SaloStatus;
 import com.vitechteam.sdlc.scm.ScmResolver;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -55,7 +56,7 @@ public class SaloRest {
     }
 
     @GetMapping("{organization}/{name}/status")
-    public Salo findStatus(
+    public SaloStatus findStatus(
             Principal principal,
             @PathVariable String organization,
             @PathVariable String name
@@ -76,7 +77,7 @@ public class SaloRest {
         log.info("deploying salo instance [{}] for org: {}", name, organization);
         final SaloService saloService = this.scmResolver.getSaloService(principal);
         saloService
-                .findStatusByNameAndOrg(name, organization)
+                .findByNameAndOrg(name, organization)
                 .ifPresentOrElse(
                         saloService::applyInfrastructure,
                         () -> {
@@ -95,7 +96,7 @@ public class SaloRest {
         log.info("destroying salo instance [{}] for org: {}", name, organization);
         final SaloService saloService = this.scmResolver.getSaloService(principal);
         saloService
-                .findStatusByNameAndOrg(name, organization)
+                .findByNameAndOrg(name, organization)
                 .ifPresentOrElse(
                         saloService::destroyInfrastructure,
                         () -> {

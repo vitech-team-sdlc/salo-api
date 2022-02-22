@@ -71,24 +71,13 @@ public interface TestFixtures {
         return new NodeGroup(
                 name,
                 2,
-                1,
-                1,
+                2,
+                2,
                 List.of(), //List.of(new Label("label-key", "label-value")),
                 List.of(), //List.of(new Taint("taint-key", "taint-value", TaintEffect.PreferNoSchedule)),
                 List.of(), //List.of(new Tag("tag-key", "tag-value", true)),
-                60,
-                List.of(
-                        "m5.xlarge"/*,
-                        "m5a.xlarge",
-                        "m5d.xlarge",
-                        "m5ad.xlarge",
-                        "m5n.xlarge",
-                        "m5.2xlarge",
-                        "m5a.2xlarge",
-                        "m5d.2xlarge",
-                        "m5ad.2xlarge",
-                        "m5n.2xlarge"*/
-                )
+                30,
+                List.of("m5a.large")
         );
     }
 }

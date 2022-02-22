@@ -107,3 +107,11 @@ Authorization: Bearer {{gh-token}}
 POST {{hostname}}/salo/{{organization}}/{{name}}/destroy
 Content-Type: application/json
 Authorization: Bearer {{gh-token}}
+
+### Calculate cost on Sa10 template
+POST {{hostname}}/cost
+Content-Type: application/json
+Authorization: Bearer {{gh-token}}
+
+< ./src/main/resources/templates/envs_3_single_cluster.json
+#< ./src/main/resources/templates/envs_4_single_cluster.json

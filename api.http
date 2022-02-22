@@ -27,7 +27,7 @@ GET {{hostname}}/salo/{{organization}}/{{name}}
 Content-Type: application/json
 Authorization: Bearer {{gh-token}}
 
-### Get the {{name}} Sa10 installations status from the {{organization}}
+### Get the Sa10 installations status
 GET {{hostname}}/salo/{{organization}}/{{name}}/status
 Content-Type: application/json
 Authorization: Bearer {{gh-token}}

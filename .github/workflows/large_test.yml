@@ -8,6 +8,10 @@ on:
 
   workflow_dispatch:
 
+concurrency: 
+  group: one-at-a-time
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest

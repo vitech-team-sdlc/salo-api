@@ -1,4 +1,4 @@
-name: Run Large Test
+name: FOSS Scan
 
 on:
   push:

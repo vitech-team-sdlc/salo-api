@@ -25,10 +25,10 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-#      - name: Fossa Action
-#        uses: fossa-contrib/fossa-action@v2
-#        with:
-#          fossa-api-key: ${{ secrets.FOSSA_API_KEY }}
+      - name: Fossa Action
+        uses: fossa-contrib/fossa-action@v2
+        with:
+          fossa-api-key: ${{ secrets.FOSSA_API_KEY }}
 
       - name: Dependencies
         uses: gradle/gradle-build-action@v2.1.3

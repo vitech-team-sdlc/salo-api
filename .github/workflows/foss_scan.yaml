@@ -1,4 +1,4 @@
- name: FOSS Scan
+name: FOSS Scan
 
 on:
   pull_request:
@@ -30,7 +30,7 @@ jobs:
 #        with:
 #          fossa-api-key: ${{ secrets.FOSSA_API_KEY }}
 
-      - name: Depdencies
+      - name: Dependencies
         uses: gradle/gradle-build-action@v2.1.3
         with:
           gradle-executable: gradlew

@@ -29,3 +29,14 @@ jobs:
         uses: fossa-contrib/fossa-action@v2
         with:
           fossa-api-key: ${{ secrets.FOSSA_API_KEY }}
+      
+      - name: Scan the code
+        id: scancode
+        uses: zephyrproject-rtos/action_scancode@v1
+        with:
+          directory-to-scan: 'scan/'
+      - name: Artifact Upload
+        uses: actions/upload-artifact@v1
+        with:
+          name: scancode
+          path: ./artifacts

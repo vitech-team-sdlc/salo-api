@@ -1,12 +1,8 @@
 name: FOSS Scan
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
-
-  workflow_dispatch:
 
 concurrency: 
   group: fossa-one-at-a-time

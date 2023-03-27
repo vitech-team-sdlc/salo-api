@@ -35,6 +35,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+  implementation 'org.springframework:spring-beans'
 
   //  for GH secret encryption
   implementation "com.goterl:lazysodium-java:5.1.1"

@@ -1,0 +1,48 @@
+name: FOSS Scan
+
+on:
+  pull_request:
+    branches: [ main ]
+
+concurrency: 
+  group: fossa-one-at-a-time
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Java Setup
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Fossa Action
+        uses: fossa-contrib/fossa-action@v2
+        with:
+          fossa-api-key: ${{ secrets.FOSSA_API_KEY }}
+
+      - name: Dependencies
+        uses: gradle/gradle-build-action@v2.1.3
+        with:
+          gradle-executable: gradlew
+          arguments: dependencies
+      
+      - name: Scan the code
+        id: scancode
+        uses: zephyrproject-rtos/action_scancode@v1
+        with:
+          directory-to-scan: './'
+      - name: Artifact Upload
+        uses: actions/upload-artifact@v1
+        with:
+          name: scancode
+          path: ./artifacts

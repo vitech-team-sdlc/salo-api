@@ -1,4 +1,6 @@
 # Getting Started
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fvitech-team-sdlc%2Fsalo-api.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fvitech-team-sdlc%2Fsalo-api?ref=badge_shield)
+
 
 ## Initial configuration
 
@@ -42,3 +44,7 @@ Technical documentation could be found [here](docs/docs.md)
 Repository: https://github.com/vitech-team-sdlc/sdlc-ui
 Mockups: https://www.figma.com/file/BmnoCSSRYaPxCsqd1IJTCa/Salo-(SDLC)?node-id=0%3A1
 Initial dev mockups: https://whimsical.com/sdlc-9iJvu6pNAXzUQBYYR61qAM
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fvitech-team-sdlc%2Fsalo-api.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fvitech-team-sdlc%2Fsalo-api?ref=badge_large)
